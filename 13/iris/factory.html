@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iris Factory — p=13 · OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem;display:flex;flex-direction:column;align-items:center}
+::selection{background:#8C50C8;color:#fff}
+a{color:#8C50C8;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#8C50C8;text-shadow:0 0 30px rgba(140,80,200,0.3);margin-bottom:0.5rem}
+.subtitle{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:2rem}
+#generate{padding:10px 32px;background:none;border:1px solid #8C50C8;color:#8C50C8;font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:3px;cursor:pointer;border-radius:4px;transition:all 0.3s;margin-bottom:2rem}
+#generate:hover{background:#8C50C8;color:#111}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:min(90vw,600px)}
+.iris-card{display:flex;flex-direction:column;align-items:center;background:#0a0a0a;border-radius:8px;padding:16px;border:1px solid #1a1a1a;transition:border-color 0.3s}
+.iris-card:hover{border-color:#8C50C8}
+.iris-card canvas{border-radius:50%;margin-bottom:8px}
+.iris-card .code{font-size:0.5rem;color:#555;letter-spacing:1px;text-align:center;word-break:break-all;line-height:1.4}
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem;width:100%}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#8C50C8;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<h1>Iris Factory</h1>
+<p class="subtitle">every identity is unique</p>
+
+<button id="generate">GENERATE</button>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../../2/">2</a> ·
+    <a href="../../3/">3</a> ·
+    <a href="../../5/">5</a> ·
+    <a href="../../7/">7</a> ·
+    <a href="../../11/">11</a> ·
+    <a href="../../13/" class="current">13</a> ·
+    <a href="../../17/">17</a> ·
+    <a href="../../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const RING_COLORS = ['#B42838','#E06800','#1A8A32','#2850A8','#C8A820','#8C50C8','#888888'];
+const RING_PRIMES = [2, 3, 5, 7, 11, 13, 17];
+const SIZE = 150;
+const PUPIL = 12;
+const MAX_R = 68;
+
+function hexToRgb(hex) {
+  return {
+    r: parseInt(hex.slice(1, 3), 16),
+    g: parseInt(hex.slice(3, 5), 16),
+    b: parseInt(hex.slice(5, 7), 16)
+  };
+}
+
+function randomValues() {
+  return RING_PRIMES.map(() => Math.floor(Math.random() * 10) + 1);
+}
+
+function drawIris(canvas, values) {
+  const ctx = canvas.getContext('2d');
+  const cx = SIZE / 2, cy = SIZE / 2;
+  const ringW = (MAX_R - PUPIL) / 7;
+
+  ctx.clearRect(0, 0, SIZE, SIZE);
+
+  // Background
+  ctx.beginPath();
+  ctx.arc(cx, cy, MAX_R + 3, 0, Math.PI * 2);
+  ctx.fillStyle = '#050505';
+  ctx.fill();
+
+  // Rings outside-in
+  for (let i = 6; i >= 0; i--) {
+    const outerR = PUPIL + ringW * (i + 1);
+    const rgb = hexToRgb(RING_COLORS[i]);
+    const intensity = values[i] / 10;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${0.1 + intensity * 0.6})`;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${0.3 + intensity * 0.6})`;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Radiating texture
+    const innerR = PUPIL + ringW * i;
+    const segments = Math.floor(8 + intensity * 24);
+    for (let s = 0; s < segments; s++) {
+      const a = (Math.PI * 2 * s) / segments + (i * 0.1);
+      ctx.beginPath();
+      ctx.moveTo(cx + innerR * Math.cos(a), cy + innerR * Math.sin(a));
+      ctx.lineTo(cx + outerR * Math.cos(a + 0.015), cy + outerR * Math.sin(a + 0.015));
+      ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${intensity * 0.3})`;
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+    }
+  }
+
+  // Pupil
+  ctx.beginPath();
+  ctx.arc(cx, cy, PUPIL, 0, Math.PI * 2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+
+  // Highlight
+  ctx.beginPath();
+  ctx.arc(cx - 3, cy - 3, 3, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fill();
+}
+
+function makeCodeString(values) {
+  return values.map((v, i) => `${RING_PRIMES[i]}:${v}`).join(' ');
+}
+
+function generateGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  for (let n = 0; n < 9; n++) {
+    const values = randomValues();
+    const card = document.createElement('div');
+    card.className = 'iris-card';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    card.appendChild(canvas);
+
+    const code = document.createElement('div');
+    code.className = 'code';
+    code.textContent = makeCodeString(values);
+    card.appendChild(code);
+
+    grid.appendChild(card);
+    drawIris(canvas, values);
+  }
+}
+
+document.getElementById('generate').addEventListener('click', generateGrid);
+generateGrid();
+</script>
+</body>
+</html>

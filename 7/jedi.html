@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEDI — Emotion Factory — OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#888;font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
+::selection{background:#28B450;color:#fff}
+a{color:#28B450;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+
+.container{max-width:500px;width:100%;text-align:center}
+
+header{padding:2rem 0 1.5rem;border-bottom:1px solid #1a1a1a;margin-bottom:2rem}
+header h1{font-family:'Creepster',cursive;font-size:clamp(1.8rem,5vw,3rem);color:#28B450;text-shadow:0 0 40px rgba(40,180,80,0.15);letter-spacing:4px}
+header p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#444;margin-top:0.5rem;letter-spacing:3px}
+
+.ring-container{position:relative;width:260px;height:260px;margin:2rem auto}
+.ring-bg{fill:none;stroke:#1a1a1a;stroke-width:8}
+.ring-progress{fill:none;stroke:#28B450;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.5s ease;filter:drop-shadow(0 0 8px rgba(40,180,80,0.3))}
+.ring-text{font-family:'Space Mono',monospace;fill:#28B450;text-anchor:middle;dominant-baseline:central}
+.ring-time{font-size:2.5rem;font-weight:700}
+.ring-label{font-size:0.65rem;fill:#555;letter-spacing:3px}
+
+.phase-info{min-height:120px;padding:1.5rem 0}
+.phase-letter{font-family:'Creepster',cursive;font-size:3rem;color:#28B450;opacity:0.3;transition:opacity 0.5s}
+.phase-letter.active{opacity:1}
+.phase-name{font-size:0.8rem;color:#666;letter-spacing:3px;margin:0.5rem 0;text-transform:uppercase}
+.phase-instruction{font-family:'Inter',sans-serif;font-weight:300;font-size:0.85rem;color:#555;line-height:1.7;max-width:380px;margin:0.5rem auto;min-height:3.5em}
+
+.letters{display:flex;justify-content:center;gap:1.5rem;margin:1rem 0}
+.letters span{font-family:'Creepster',cursive;font-size:1.6rem;color:#222;transition:all 0.5s}
+.letters span.done{color:#28B450;opacity:0.4}
+.letters span.active{color:#28B450;text-shadow:0 0 20px rgba(40,180,80,0.4)}
+
+.controls{margin:2rem 0}
+.btn{background:none;border:2px solid #28B450;color:#28B450;font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:3px;padding:12px 32px;cursor:pointer;border-radius:4px;transition:all 0.3s;text-transform:uppercase}
+.btn:hover{background:#28B450;color:#0a0a0a}
+.btn:disabled{opacity:0.3;cursor:default}
+.btn:disabled:hover{background:none;color:#28B450}
+
+.status{font-family:'Inter',sans-serif;font-weight:300;font-size:0.65rem;color:#333;letter-spacing:2px;margin-top:1rem}
+
+footer{margin-top:auto;padding:3rem 0 1rem;text-align:center;border-top:1px solid #1a1a1a;width:100%;max-width:500px}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#28B450;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>J.E.D.I.</h1>
+    <p>emotion factory — 5 min protocol</p>
+  </header>
+
+  <div class="letters">
+    <span id="lJ">J</span>
+    <span id="lE">E</span>
+    <span id="lD">D</span>
+    <span id="lI">I</span>
+  </div>
+
+  <div class="ring-container">
+    <svg viewBox="0 0 260 260" width="260" height="260">
+      <circle class="ring-bg" cx="130" cy="130" r="110"/>
+      <circle class="ring-progress" id="progress" cx="130" cy="130" r="110"
+        stroke-dasharray="691.15" stroke-dashoffset="0"
+        transform="rotate(-90 130 130)"/>
+      <text class="ring-text ring-time" x="130" y="122" id="timer">5:00</text>
+      <text class="ring-text ring-label" x="130" y="155" id="phaseLabel">READY</text>
+    </svg>
+  </div>
+
+  <div class="phase-info">
+    <div class="phase-instruction" id="instruction">
+      Five minutes. Four phases. One protocol.<br>
+      Press begin when you are ready.
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="startBtn" onclick="startProtocol()">Begin</button>
+  </div>
+  <div class="status" id="status">R3 · the heart ring</div>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/" class="current">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const phases = [
+  { letter:'J', name:'JOY',       seconds:60,  instruction:'Recall a moment of genuine joy. Not the idea of joy — the actual memory. Where were you? What did the air feel like? Let the sensation rise without narrating it.' },
+  { letter:'E', name:'ENGAGE',    seconds:60,  instruction:'Stay with what arrived. Do not analyze it. Do not name it. Just sit with the feeling the way you would sit with a friend who does not need you to speak.' },
+  { letter:'D', name:'DIGEST',    seconds:60,  instruction:'Let it transform. The feeling is changing — let it. Joy may become tenderness. Tenderness may become grief. Grief may become stillness. Follow it. Do not steer.' },
+  { letter:'I', name:'INTEGRATE', seconds:120, instruction:'Breathe it into the body. With each inhale, pull whatever remains into your chest. With each exhale, let it spread — into your hands, your feet, your spine. Two minutes. No rush.' }
+];
+
+let running = false;
+let currentPhase = -1;
+let elapsed = 0;
+let total = 300;
+let intervalId = null;
+
+const circumference = 2 * Math.PI * 110;
+
+function updateDisplay(timeLeft, phaseName) {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  document.getElementById('timer').textContent = m + ':' + String(s).padStart(2,'0');
+  document.getElementById('phaseLabel').textContent = phaseName;
+
+  const progress = elapsed / total;
+  const offset = circumference * (1 - progress);
+  document.getElementById('progress').style.strokeDashoffset = offset;
+}
+
+function setPhase(index) {
+  currentPhase = index;
+  const p = phases[index];
+  document.getElementById('instruction').textContent = p.instruction;
+
+  ['J','E','D','I'].forEach((l, i) => {
+    const el = document.getElementById('l' + l);
+    el.className = i < index ? 'done' : i === index ? 'active' : '';
+  });
+}
+
+function tick() {
+  elapsed++;
+  let acc = 0;
+  for (let i = 0; i < phases.length; i++) {
+    if (elapsed <= acc + phases[i].seconds) {
+      if (currentPhase !== i) setPhase(i);
+      const phaseElapsed = elapsed - acc;
+      const phaseRemain = phases[i].seconds - phaseElapsed;
+      updateDisplay(total - elapsed, phases[i].name);
+      return;
+    }
+    acc += phases[i].seconds;
+  }
+  // done
+  clearInterval(intervalId);
+  running = false;
+  document.getElementById('timer').textContent = '0:00';
+  document.getElementById('phaseLabel').textContent = 'COMPLETE';
+  document.getElementById('instruction').textContent = 'The protocol is complete. Whatever you feel right now — that is R3 speaking. Listen.';
+  document.getElementById('startBtn').textContent = 'Again';
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('status').textContent = 'protocol complete';
+  document.getElementById('progress').style.strokeDashoffset = '0';
+  ['J','E','D','I'].forEach(l => {
+    document.getElementById('l' + l).className = 'done';
+  });
+}
+
+function startProtocol() {
+  if (running) return;
+  running = true;
+  elapsed = 0;
+  currentPhase = -1;
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('startBtn').textContent = 'Running';
+  document.getElementById('status').textContent = 'breathe';
+  document.getElementById('progress').style.strokeDashoffset = circumference;
+  setPhase(0);
+  updateDisplay(total, phases[0].name);
+  intervalId = setInterval(tick, 1000);
+}
+</script>
+
+</body>
+</html>

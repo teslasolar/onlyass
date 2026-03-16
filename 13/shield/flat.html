@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ring Configuration — p=13 · OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem;display:flex;flex-direction:column;align-items:center}
+::selection{background:#8C50C8;color:#fff}
+a{color:#8C50C8;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#8C50C8;text-shadow:0 0 30px rgba(140,80,200,0.3);margin-bottom:0.5rem}
+.subtitle{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:2rem}
+#chart-area{width:min(90vw,450px);height:min(90vw,450px);margin:0 auto}
+svg{width:100%;height:100%}
+.controls{display:flex;flex-direction:column;gap:10px;margin-top:2rem;width:min(90vw,400px)}
+.slider-row{display:flex;align-items:center;gap:10px;font-size:0.7rem}
+.slider-row label{width:100px;text-align:right;letter-spacing:1px}
+.slider-row input[type=range]{flex:1;accent-color:var(--ring-color);height:4px}
+.slider-row .val{width:24px;text-align:center;color:#8C50C8}
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem;width:100%}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#8C50C8;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<h1>Your Ring Configuration</h1>
+<p class="subtitle">a visual identity fingerprint</p>
+
+<div id="chart-area">
+  <svg id="radar" viewBox="0 0 450 450"></svg>
+</div>
+
+<div class="controls" id="controls"></div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../../2/">2</a> ·
+    <a href="../../3/">3</a> ·
+    <a href="../../5/">5</a> ·
+    <a href="../../7/">7</a> ·
+    <a href="../../11/">11</a> ·
+    <a href="../../13/" class="current">13</a> ·
+    <a href="../../17/">17</a> ·
+    <a href="../../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const rings = [
+  { name: 'R0 Body', prime: 2, color: '#B42838', value: 5 },
+  { name: 'R1 Signal', prime: 3, color: '#E06800', value: 5 },
+  { name: 'R2 Gate', prime: 5, color: '#1A8A32', value: 5 },
+  { name: 'R3 Heart', prime: 7, color: '#2850A8', value: 5 },
+  { name: 'R4 Voice', prime: 11, color: '#C8A820', value: 5 },
+  { name: 'R5 Mirror', prime: 13, color: '#8C50C8', value: 5 },
+  { name: 'R6 Watcher', prime: 17, color: '#888888', value: 5 }
+];
+
+const svg = document.getElementById('radar');
+const cx = 225, cy = 225, maxR = 180;
+const n = rings.length;
+
+function angleFor(i) {
+  return (Math.PI * 2 * i / n) - Math.PI / 2;
+}
+
+function pointAt(i, val) {
+  const a = angleFor(i);
+  const r = (val / 10) * maxR;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+
+function drawRadar() {
+  let html = '';
+
+  // Grid circles
+  for (let level = 2; level <= 10; level += 2) {
+    const r = (level / 10) * maxR;
+    html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1a1a1a" stroke-width="1"/>`;
+  }
+
+  // Axes
+  for (let i = 0; i < n; i++) {
+    const p = pointAt(i, 10);
+    html += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#1a1a1a" stroke-width="1"/>`;
+    // Labels
+    const lp = pointAt(i, 11.5);
+    html += `<text x="${lp.x}" y="${lp.y}" text-anchor="middle" dominant-baseline="middle" fill="${rings[i].color}" font-family="Space Mono,monospace" font-size="10">${rings[i].name}</text>`;
+  }
+
+  // Filled shape
+  const pts = rings.map((r, i) => {
+    const p = pointAt(i, r.value);
+    return `${p.x},${p.y}`;
+  }).join(' ');
+  html += `<polygon points="${pts}" fill="rgba(140,80,200,0.15)" stroke="#8C50C8" stroke-width="2"/>`;
+
+  // Dots on vertices
+  rings.forEach((r, i) => {
+    const p = pointAt(i, r.value);
+    html += `<circle cx="${p.x}" cy="${p.y}" r="5" fill="${r.color}"/>`;
+  });
+
+  svg.innerHTML = html;
+}
+
+// Build sliders
+const controlsEl = document.getElementById('controls');
+rings.forEach((ring, i) => {
+  const row = document.createElement('div');
+  row.className = 'slider-row';
+  row.style.setProperty('--ring-color', ring.color);
+  row.innerHTML = `
+    <label style="color:${ring.color}">${ring.name}</label>
+    <input type="range" min="0" max="10" value="${ring.value}" data-index="${i}">
+    <span class="val" id="val-${i}">${ring.value}</span>
+  `;
+  controlsEl.appendChild(row);
+
+  row.querySelector('input').addEventListener('input', e => {
+    const val = parseInt(e.target.value);
+    rings[i].value = val;
+    document.getElementById(`val-${i}`).textContent = val;
+    drawRadar();
+  });
+});
+
+drawRadar();
+</script>
+</body>
+</html>

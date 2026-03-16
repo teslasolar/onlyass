@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Floor — Proprioception — OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column}
+::selection{background:#B42838;color:#fff}
+a{color:#B42838;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+
+header{text-align:center;padding:2rem 2rem 1rem}
+header h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#B42838;text-shadow:0 0 30px rgba(180,40,56,0.15)}
+header p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.7rem;color:#444;margin-top:0.5rem;letter-spacing:2px}
+
+.exercise{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;min-height:50vh}
+.prompt{font-family:'Inter',sans-serif;font-weight:300;font-size:clamp(1rem,3vw,1.4rem);color:#666;line-height:1.8;text-align:center;max-width:500px;opacity:0;transition:opacity 1.5s ease}
+.prompt.visible{opacity:1}
+.prompt em{color:#B42838;font-style:normal}
+
+.progress{text-align:center;padding:0 2rem 1rem}
+.progress-bar{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#1a1a1a;transition:background 0.5s ease}
+.dot.active{background:#B42838}
+.dot.done{background:#5a1a22}
+.hint{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#333;letter-spacing:2px}
+
+footer{text-align:center;padding:2rem;border-top:1px solid #1a1a1a}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#B42838;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Floor</h1>
+  <p>proprioception exercise</p>
+</header>
+
+<div class="exercise" id="exercise">
+  <div class="prompt" id="prompt"></div>
+</div>
+
+<div class="progress">
+  <div class="progress-bar" id="dots"></div>
+  <div class="hint" id="hint">click anywhere or wait</div>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/" class="current">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const prompts = [
+  'Feel your feet on the floor.',
+  'Notice the weight distribution.<br>Left foot? Right foot?',
+  'Feel your sit bones on the chair.',
+  'Notice where your spine meets the seat.',
+  'Feel the air on your skin.',
+  'Notice the temperature.',
+  'Feel the weight of your hands.<br>Where are they resting?',
+  'Notice your jaw. Is it clenched?<br>Let it soften.',
+  'Feel your breath moving.<br>Don\'t change it. Just notice.',
+  '<em>You are here. This is the ground.</em>'
+];
+
+const promptEl = document.getElementById('prompt');
+const dotsEl = document.getElementById('dots');
+const hintEl = document.getElementById('hint');
+let current = -1;
+let autoTimer = null;
+
+// build dots
+for (let i = 0; i < prompts.length; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot';
+  dot.dataset.index = i;
+  dotsEl.appendChild(dot);
+}
+
+function showPrompt(index) {
+  if (index >= prompts.length) {
+    // finished
+    promptEl.classList.remove('visible');
+    setTimeout(() => {
+      promptEl.innerHTML = '<em>Done.</em><br><br><span style="font-size:0.7em;color:#444">Click to begin again.</span>';
+      promptEl.classList.add('visible');
+    }, 600);
+    current = -1;
+    clearTimeout(autoTimer);
+    hintEl.textContent = 'click to restart';
+
+    // mark all done
+    document.querySelectorAll('.dot').forEach(d => {
+      d.className = 'dot done';
+    });
+    return;
+  }
+
+  // fade out
+  promptEl.classList.remove('visible');
+
+  setTimeout(() => {
+    promptEl.innerHTML = prompts[index];
+    promptEl.classList.add('visible');
+    current = index;
+
+    // update dots
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      if (i < index) d.className = 'dot done';
+      else if (i === index) d.className = 'dot active';
+      else d.className = 'dot';
+    });
+
+    if (index === 0) hintEl.textContent = 'click anywhere or wait 8s';
+    if (index === prompts.length - 1) hintEl.textContent = '';
+
+    // auto advance
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(() => advance(), 8000);
+  }, 600);
+}
+
+function advance() {
+  clearTimeout(autoTimer);
+  if (current === -1) {
+    // reset
+    document.querySelectorAll('.dot').forEach(d => d.className = 'dot');
+    showPrompt(0);
+  } else {
+    showPrompt(current + 1);
+  }
+}
+
+// start
+document.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+  advance();
+});
+
+// initial prompt after brief pause
+setTimeout(() => showPrompt(0), 1000);
+</script>
+
+</body>
+</html>

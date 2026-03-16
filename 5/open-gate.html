@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>open-gate — Drug Interaction Circuit Analyzer — OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
+::selection{background:#DCA030;color:#111}
+a{color:#DCA030;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#DCA030;text-align:center;margin-bottom:0.5rem;text-shadow:0 0 30px rgba(220,160,48,0.2)}
+.subtitle{text-align:center;font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:2rem}
+.disclaimer{max-width:700px;margin:0 auto 2rem;padding:12px 16px;background:#1a1500;border:1px solid #DCA030;border-radius:4px;font-family:'Inter',sans-serif;font-weight:300;font-size:0.65rem;color:#997520;line-height:1.6;text-align:center}
+.controls{max-width:700px;margin:0 auto 2rem;text-align:center}
+.controls label{font-size:0.7rem;letter-spacing:2px;color:#555;margin-right:8px}
+.controls select{background:#0f0f0f;color:#DCA030;border:1px solid #333;padding:8px 12px;font-family:'Space Mono',monospace;font-size:0.75rem;border-radius:4px;cursor:pointer;min-width:200px}
+.controls select:focus{outline:none;border-color:#DCA030}
+.circuit{max-width:700px;margin:0 auto 2rem}
+.circuit svg{width:100%;height:auto}
+.legend{max-width:700px;margin:0 auto 2rem;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;font-family:'Inter',sans-serif;font-size:0.6rem}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.info{max-width:700px;margin:0 auto 2rem;font-family:'Inter',sans-serif;font-weight:300;font-size:0.8rem;color:#555;line-height:1.8;padding:16px;background:#0a0a0a;border-radius:4px;border-left:3px solid #DCA030;min-height:80px}
+.info em{color:#DCA030;font-style:normal}
+.info h3{font-family:'Space Mono',monospace;font-size:0.75rem;color:#888;margin-bottom:8px}
+.info p{margin-bottom:6px}
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#DCA030;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<h1>open-gate</h1>
+<div class="subtitle">drug interaction circuit analyzer</div>
+
+<div class="disclaimer">
+  ⚠ EDUCATIONAL TOOL ONLY — This visualization is a simplified model for learning purposes. It does not constitute medical advice. Drug interactions are complex, dose-dependent, and vary between individuals. Always consult a qualified healthcare provider before combining substances.
+</div>
+
+<div class="controls">
+  <label>SUBSTANCE:</label>
+  <select id="substance">
+    <option value="">— select —</option>
+    <option value="caffeine">Caffeine</option>
+    <option value="alcohol">Alcohol (Ethanol)</option>
+    <option value="nicotine">Nicotine</option>
+    <option value="thc">THC (Cannabis)</option>
+    <option value="ssri">SSRIs (e.g. Sertraline)</option>
+    <option value="benzo">Benzodiazepines (e.g. Diazepam)</option>
+    <option value="amphetamine">Amphetamines</option>
+    <option value="psilocybin">Psilocybin</option>
+    <option value="ketamine">Ketamine</option>
+    <option value="mdma">MDMA</option>
+  </select>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot" style="background:#2a2a2a"></span> Inactive</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#4CAF50"></span> Opened / Enhanced</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#f44336"></span> Closed / Inhibited</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#DCA030"></span> Modulated</div>
+</div>
+
+<div class="circuit">
+  <svg id="circuitSvg" viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+    <!-- Central node -->
+    <circle cx="350" cy="180" r="36" fill="none" stroke="#333" stroke-width="2" id="center"/>
+    <text x="350" y="175" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="9">THALAMIC</text>
+    <text x="350" y="188" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="9">GATE</text>
+
+    <!-- Serotonin (5-HT) -->
+    <line x1="350" y1="144" x2="350" y2="50" stroke="#333" stroke-width="2" id="line-serotonin"/>
+    <circle cx="350" cy="36" r="28" fill="none" stroke="#333" stroke-width="2" id="node-serotonin"/>
+    <text x="350" y="33" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="8">5-HT</text>
+    <text x="350" y="44" text-anchor="middle" fill="#444" font-family="Inter,sans-serif" font-size="7">serotonin</text>
+    <rect x="338" y="86" width="24" height="14" rx="3" fill="#0f0f0f" stroke="#333" stroke-width="1.5" id="gate-serotonin"/>
+    <text x="350" y="96" text-anchor="middle" fill="#444" font-family="Space Mono,monospace" font-size="7" id="gate-text-serotonin">—</text>
+
+    <!-- Dopamine -->
+    <line x1="315" y1="156" x2="180" y2="70" stroke="#333" stroke-width="2" id="line-dopamine"/>
+    <circle cx="160" cy="56" r="28" fill="none" stroke="#333" stroke-width="2" id="node-dopamine"/>
+    <text x="160" y="53" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="8">DA</text>
+    <text x="160" y="64" text-anchor="middle" fill="#444" font-family="Inter,sans-serif" font-size="7">dopamine</text>
+    <rect x="236" y="104" width="24" height="14" rx="3" fill="#0f0f0f" stroke="#333" stroke-width="1.5" id="gate-dopamine"/>
+    <text x="248" y="114" text-anchor="middle" fill="#444" font-family="Space Mono,monospace" font-size="7" id="gate-text-dopamine">—</text>
+
+    <!-- GABA -->
+    <line x1="385" y1="156" x2="520" y2="70" stroke="#333" stroke-width="2" id="line-gaba"/>
+    <circle cx="540" cy="56" r="28" fill="none" stroke="#333" stroke-width="2" id="node-gaba"/>
+    <text x="540" y="53" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="8">GABA</text>
+    <text x="540" y="64" text-anchor="middle" fill="#444" font-family="Inter,sans-serif" font-size="7">inhibitory</text>
+    <rect x="440" y="104" width="24" height="14" rx="3" fill="#0f0f0f" stroke="#333" stroke-width="1.5" id="gate-gaba"/>
+    <text x="452" y="114" text-anchor="middle" fill="#444" font-family="Space Mono,monospace" font-size="7" id="gate-text-gaba">—</text>
+
+    <!-- Glutamate -->
+    <line x1="315" y1="204" x2="180" y2="290" stroke="#333" stroke-width="2" id="line-glutamate"/>
+    <circle cx="160" cy="304" r="28" fill="none" stroke="#333" stroke-width="2" id="node-glutamate"/>
+    <text x="160" y="301" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="8">GLU</text>
+    <text x="160" y="312" text-anchor="middle" fill="#444" font-family="Inter,sans-serif" font-size="7">glutamate</text>
+    <rect x="236" y="240" width="24" height="14" rx="3" fill="#0f0f0f" stroke="#333" stroke-width="1.5" id="gate-glutamate"/>
+    <text x="248" y="250" text-anchor="middle" fill="#444" font-family="Space Mono,monospace" font-size="7" id="gate-text-glutamate">—</text>
+
+    <!-- Norepinephrine -->
+    <line x1="385" y1="204" x2="520" y2="290" stroke="#333" stroke-width="2" id="line-norepinephrine"/>
+    <circle cx="540" cy="304" r="28" fill="none" stroke="#333" stroke-width="2" id="node-norepinephrine"/>
+    <text x="540" y="301" text-anchor="middle" fill="#555" font-family="Space Mono,monospace" font-size="8">NE</text>
+    <text x="540" y="312" text-anchor="middle" fill="#444" font-family="Inter,sans-serif" font-size="7">norepinephrine</text>
+    <rect x="440" y="240" width="24" height="14" rx="3" fill="#0f0f0f" stroke="#333" stroke-width="1.5" id="gate-norepinephrine"/>
+    <text x="452" y="250" text-anchor="middle" fill="#444" font-family="Space Mono,monospace" font-size="7" id="gate-text-norepinephrine">—</text>
+  </svg>
+</div>
+
+<div class="info" id="info">
+  <h3>Select a substance</h3>
+  <p>Choose a substance from the dropdown to see which neurotransmitter gates it affects. Lines and nodes will light up to show whether each pathway is opened, closed, or modulated.</p>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/" class="current">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const substances = {
+  caffeine: {
+    name: "Caffeine",
+    pathways: {
+      serotonin: "modulate",
+      dopamine: "open",
+      gaba: "close",
+      glutamate: "open",
+      norepinephrine: "open"
+    },
+    desc: `<h3>Caffeine</h3>
+      <p><em>Adenosine antagonist.</em> Blocks adenosine receptors, preventing the "sleepy" signal. This indirectly opens dopamine, glutamate, and norepinephrine gates while suppressing GABAergic inhibition.</p>
+      <p>The gate effect: more signals get through. Alertness rises. The filter loosens. At high doses, the gate opens too far — anxiety, jitteriness, the feeling that everything is too loud and too bright.</p>`
+  },
+  alcohol: {
+    name: "Alcohol",
+    pathways: {
+      serotonin: "modulate",
+      dopamine: "open",
+      gaba: "open",
+      glutamate: "close",
+      norepinephrine: "close"
+    },
+    desc: `<h3>Alcohol (Ethanol)</h3>
+      <p><em>GABA-A agonist, NMDA antagonist.</em> Opens the GABA gate wide — the brain's primary inhibitory pathway floods. Simultaneously closes the glutamate gate, blocking excitatory signaling.</p>
+      <p>The gate effect: fewer signals get through. The world softens. Inhibitions dissolve because the inhibition of inhibition is itself inhibited. Dopamine ticks up in the reward circuit — the gate that says "this feels good" swings open.</p>`
+  },
+  nicotine: {
+    name: "Nicotine",
+    pathways: {
+      serotonin: "modulate",
+      dopamine: "open",
+      gaba: "modulate",
+      glutamate: "open",
+      norepinephrine: "open"
+    },
+    desc: `<h3>Nicotine</h3>
+      <p><em>Nicotinic acetylcholine receptor agonist.</em> Mimics acetylcholine at nAChRs, triggering downstream release of dopamine, glutamate, and norepinephrine. Modulates GABA and serotonin systems.</p>
+      <p>The gate effect: sharpening. The filter becomes more selective — not more open, but better tuned. Attention narrows. Signal-to-noise ratio improves temporarily. Then tolerance builds and the gate recalibrates.</p>`
+  },
+  thc: {
+    name: "THC",
+    pathways: {
+      serotonin: "modulate",
+      dopamine: "open",
+      gaba: "modulate",
+      glutamate: "modulate",
+      norepinephrine: "modulate"
+    },
+    desc: `<h3>THC (Cannabis)</h3>
+      <p><em>CB1 receptor agonist.</em> Activates endocannabinoid receptors that normally fine-tune neurotransmitter release. Modulates GABA and glutamate release presynaptically. Increases dopamine in mesolimbic pathway.</p>
+      <p>The gate effect: the filter gets weird. Some signals that normally get blocked start coming through — sensory enhancement, novel pattern detection. But the gating becomes unreliable. Time perception shifts because the gate's timing mechanism is disrupted.</p>`
+  },
+  ssri: {
+    name: "SSRIs",
+    pathways: {
+      serotonin: "open",
+      dopamine: "modulate",
+      gaba: "modulate",
+      glutamate: "modulate",
+      norepinephrine: "modulate"
+    },
+    desc: `<h3>SSRIs (Selective Serotonin Reuptake Inhibitors)</h3>
+      <p><em>Serotonin transporter blocker.</em> Blocks the reuptake of serotonin in the synaptic cleft, increasing its availability. Over weeks, downstream receptor adaptation modulates other systems.</p>
+      <p>The gate effect: gradual recalibration. The serotonin gate stays open longer with each signal. Over 4-6 weeks, the entire gating system adjusts. Emotional signals that were flooding through get filtered more evenly. The gate doesn't close — it stabilizes.</p>`
+  },
+  benzo: {
+    name: "Benzodiazepines",
+    pathways: {
+      serotonin: "modulate",
+      dopamine: "modulate",
+      gaba: "open",
+      glutamate: "close",
+      norepinephrine: "close"
+    },
+    desc: `<h3>Benzodiazepines</h3>
+      <p><em>GABA-A positive allosteric modulator.</em> Enhances the effect of GABA at GABA-A receptors, increasing chloride ion flow. Profoundly increases inhibitory tone across the brain.</p>
+      <p>The gate effect: slam the gate shut. Anxiety signals that were getting through? Blocked. Seizure activity? Blocked. Panic signals? Blocked. But also: memory formation, motor coordination, respiratory drive — all reduced. The gate doesn't discriminate. Tolerance develops as the brain tries to pry the gate back open.</p>`
+  },
+  amphetamine: {
+    name: "Amphetamines",
+    pathways: {
+      serotonin: "open",
+      dopamine: "open",
+      gaba: "close",
+      glutamate: "open",
+      norepinephrine: "open"
+    },
+    desc: `<h3>Amphetamines</h3>
+      <p><em>Monoamine releasing agent + reuptake inhibitor.</em> Forces dopamine, norepinephrine, and serotonin out of vesicles and into the synapse. Blocks reuptake. Floods multiple pathways simultaneously.</p>
+      <p>The gate effect: forced open. Every excitatory gate cranks wide. Focus sharpens to a laser point (at therapeutic doses) because the signal-to-noise ratio spikes. At higher doses, the gate breaks — euphoria, then paranoia, then psychosis. The gate was never designed to be held open this hard.</p>`
+  },
+  psilocybin: {
+    name: "Psilocybin",
+    pathways: {
+      serotonin: "open",
+      dopamine: "modulate",
+      gaba: "close",
+      glutamate: "open",
+      norepinephrine: "modulate"
+    },
+    desc: `<h3>Psilocybin</h3>
+      <p><em>5-HT2A receptor agonist.</em> Converted to psilocin, which activates serotonin 2A receptors. Disrupts the default mode network. Increases glutamate release in prefrontal cortex. Reduces thalamic gating.</p>
+      <p>The gate effect: the gate dissolves. The thalamic filter that normally prevents cortical regions from cross-talking goes quiet. Sensory input that's normally filtered out reaches consciousness. Synesthesia. Ego dissolution. The feeling that everything is connected — because the gates between brain regions are temporarily removed.</p>`
+  },
+  ketamine: {
+    name: "Ketamine",
+    pathways: {
+      serotonin: "modulate",
+      dopamine: "open",
+      gaba: "modulate",
+      glutamate: "close",
+      norepinephrine: "modulate"
+    },
+    desc: `<h3>Ketamine</h3>
+      <p><em>NMDA receptor antagonist.</em> Blocks glutamate's primary excitatory receptor. Paradoxically increases glutamate release via disinhibition at sub-anesthetic doses. Triggers downstream BDNF and synaptogenesis.</p>
+      <p>The gate effect: dissociation. The gate between body and mind swings shut. You stop receiving signals from your own body. At the k-hole, the gate between self and world closes entirely. At sub-anesthetic doses, rapid antidepressant effects suggest the gate is being <em>reset</em> rather than just opened or closed.</p>`
+  },
+  mdma: {
+    name: "MDMA",
+    pathways: {
+      serotonin: "open",
+      dopamine: "open",
+      gaba: "modulate",
+      glutamate: "modulate",
+      norepinephrine: "open"
+    },
+    desc: `<h3>MDMA</h3>
+      <p><em>Serotonin/dopamine/norepinephrine releasing agent.</em> Massively increases serotonin release (primary effect), with significant dopamine and norepinephrine release. Triggers oxytocin release.</p>
+      <p>The gate effect: selective opening. The serotonin gate blows wide — but specifically the circuits associated with social bonding, trust, and emotional processing. Fear signals from the amygdala get dampened. The gate between "self" and "other" thins. Used in PTSD therapy because it allows traumatic memories to be processed without the gate slamming shut from fear.</p>`
+  }
+};
+
+const colors = { open: "#4CAF50", close: "#f44336", modulate: "#DCA030", none: "#333" };
+const gateSymbols = { open: "▲", close: "▼", modulate: "◆", none: "—" };
+const pathwayNames = ["serotonin", "dopamine", "gaba", "glutamate", "norepinephrine"];
+
+function update(key) {
+  const sub = substances[key];
+  pathwayNames.forEach(p => {
+    const state = sub ? sub.pathways[p] : "none";
+    const col = colors[state];
+    document.getElementById("node-" + p).setAttribute("stroke", col);
+    document.getElementById("line-" + p).setAttribute("stroke", col);
+    document.getElementById("gate-" + p).setAttribute("stroke", col);
+    document.getElementById("gate-text-" + p).setAttribute("fill", col);
+    document.getElementById("gate-text-" + p).textContent = gateSymbols[state];
+  });
+  document.getElementById("center").setAttribute("stroke", sub ? "#DCA030" : "#333");
+  document.getElementById("info").innerHTML = sub ? sub.desc :
+    `<h3>Select a substance</h3><p>Choose a substance from the dropdown to see which neurotransmitter gates it affects. Lines and nodes will light up to show whether each pathway is opened, closed, or modulated.</p>`;
+}
+
+document.getElementById("substance").addEventListener("change", function() {
+  update(this.value);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breath — 4:6 Timer — OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+::selection{background:#B42838;color:#fff}
+a{color:#B42838;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+
+header{text-align:center;padding:2rem 2rem 1rem;width:100%}
+header h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#B42838;text-shadow:0 0 30px rgba(180,40,56,0.15)}
+header p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.7rem;color:#444;margin-top:0.5rem;letter-spacing:2px}
+
+.breath-container{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;gap:2rem}
+
+.circle-wrap{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
+.circle{width:80px;height:80px;border-radius:50%;border:2px solid #B42838;transition:width 0.3s ease,height 0.3s ease;box-shadow:0 0 40px rgba(180,40,56,0.1);display:flex;align-items:center;justify-content:center}
+.circle.inhale{width:200px;height:200px;box-shadow:0 0 60px rgba(180,40,56,0.2);border-color:#B42838}
+.circle.exhale{width:80px;height:80px;box-shadow:0 0 20px rgba(180,40,56,0.05);border-color:#5a1a22}
+
+.phase{font-family:'Space Mono',monospace;font-size:0.8rem;letter-spacing:4px;color:#B42838;text-align:center;min-height:1.5em}
+.countdown{font-family:'Space Mono',monospace;font-size:2rem;color:#555;text-align:center}
+
+.controls{display:flex;flex-direction:column;align-items:center;gap:12px}
+.controls button{background:#0f0f0f;color:#B42838;border:1px solid #B42838;font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:2px;padding:8px 24px;cursor:pointer;border-radius:4px;transition:all 0.3s}
+.controls button:hover{background:#B42838;color:#111}
+.cycles{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#444;letter-spacing:1px}
+
+footer{text-align:center;padding:2rem;border-top:1px solid #1a1a1a;width:100%}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#B42838;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Breath</h1>
+  <p>the first tool — the simplest thing that works</p>
+</header>
+
+<div class="breath-container">
+  <div class="phase" id="phase">press start</div>
+  <div class="circle-wrap">
+    <div class="circle" id="circle"></div>
+  </div>
+  <div class="countdown" id="countdown">&nbsp;</div>
+  <div class="controls">
+    <button id="toggle">START</button>
+    <div class="cycles" id="cycles">cycles: 0</div>
+  </div>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/" class="current">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const phaseEl = document.getElementById('phase');
+const circleEl = document.getElementById('circle');
+const countdownEl = document.getElementById('countdown');
+const toggleBtn = document.getElementById('toggle');
+const cyclesEl = document.getElementById('cycles');
+
+let running = false;
+let cycles = 0;
+let timer = null;
+let audioCtx = null;
+let oscillator = null;
+let gainNode = null;
+
+const INHALE = 4;
+const EXHALE = 6;
+
+function initAudio() {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0;
+    gainNode.connect(audioCtx.destination);
+    oscillator = audioCtx.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 120;
+    oscillator.connect(gainNode);
+    oscillator.start();
+  } catch(e) {
+    audioCtx = null;
+  }
+}
+
+function setTone(phase, progress) {
+  if (!audioCtx || !oscillator || !gainNode) return;
+  if (phase === 'inhale') {
+    oscillator.frequency.value = 120 + progress * 80;
+    gainNode.gain.value = 0.03 + progress * 0.02;
+  } else {
+    oscillator.frequency.value = 200 - progress * 80;
+    gainNode.gain.value = 0.05 - progress * 0.04;
+  }
+}
+
+function silenceTone() {
+  if (gainNode) gainNode.gain.value = 0;
+}
+
+function breathCycle() {
+  let phase = 'inhale';
+  let remaining = INHALE;
+
+  circleEl.className = 'circle inhale';
+  circleEl.style.transition = `width ${INHALE}s ease, height ${INHALE}s ease, box-shadow ${INHALE}s ease, border-color ${INHALE}s ease`;
+  phaseEl.textContent = 'INHALE';
+  countdownEl.textContent = remaining;
+
+  timer = setInterval(() => {
+    if (!running) { clearInterval(timer); return; }
+
+    remaining--;
+
+    if (phase === 'inhale') {
+      setTone('inhale', 1 - remaining / INHALE);
+    } else {
+      setTone('exhale', 1 - remaining / EXHALE);
+    }
+
+    if (remaining <= 0) {
+      if (phase === 'inhale') {
+        phase = 'exhale';
+        remaining = EXHALE;
+        circleEl.className = 'circle exhale';
+        circleEl.style.transition = `width ${EXHALE}s ease, height ${EXHALE}s ease, box-shadow ${EXHALE}s ease, border-color ${EXHALE}s ease`;
+        phaseEl.textContent = 'EXHALE';
+      } else {
+        cycles++;
+        cyclesEl.textContent = `cycles: ${cycles}`;
+        phase = 'inhale';
+        remaining = INHALE;
+        circleEl.className = 'circle inhale';
+        circleEl.style.transition = `width ${INHALE}s ease, height ${INHALE}s ease, box-shadow ${INHALE}s ease, border-color ${INHALE}s ease`;
+        phaseEl.textContent = 'INHALE';
+      }
+    }
+
+    countdownEl.textContent = remaining;
+  }, 1000);
+}
+
+toggleBtn.addEventListener('click', () => {
+  if (!running) {
+    running = true;
+    toggleBtn.textContent = 'STOP';
+    if (!audioCtx) initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    breathCycle();
+  } else {
+    running = false;
+    toggleBtn.textContent = 'START';
+    clearInterval(timer);
+    circleEl.className = 'circle';
+    circleEl.style.transition = 'all 0.5s ease';
+    phaseEl.textContent = 'press start';
+    countdownEl.innerHTML = '&nbsp;';
+    silenceTone();
+  }
+});
+</script>
+
+</body>
+</html>

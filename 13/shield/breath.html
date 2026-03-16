@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shield Breath — p=13 · OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+::selection{background:#8C50C8;color:#fff}
+a{color:#8C50C8;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#8C50C8;text-shadow:0 0 30px rgba(140,80,200,0.3);margin-bottom:0.5rem}
+.subtitle{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:3rem}
+.breath-container{position:relative;width:min(80vw,400px);height:min(80vw,400px);display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;border-radius:50%;border:2px solid;opacity:0.6;animation:breathe 10s ease-in-out infinite}
+.ring:nth-child(1){width:100%;height:100%;border-color:#888888;animation-delay:0s}
+.ring:nth-child(2){width:85.7%;height:85.7%;border-color:#8C50C8;animation-delay:-0.2s}
+.ring:nth-child(3){width:71.4%;height:71.4%;border-color:#C8A820;animation-delay:-0.4s}
+.ring:nth-child(4){width:57.1%;height:57.1%;border-color:#2850A8;animation-delay:-0.6s}
+.ring:nth-child(5){width:42.8%;height:42.8%;border-color:#1A8A32;animation-delay:-0.8s}
+.ring:nth-child(6){width:28.5%;height:28.5%;border-color:#E06800;animation-delay:-1.0s}
+.ring:nth-child(7){width:14.2%;height:14.2%;border-color:#B42838;animation-delay:-1.2s}
+@keyframes breathe{
+  0%{transform:scale(0.6);opacity:0.3}
+  40%{transform:scale(1.0);opacity:0.8}
+  100%{transform:scale(0.6);opacity:0.3}
+}
+.guide{font-family:'Inter',sans-serif;font-weight:300;font-size:1.2rem;color:#555;letter-spacing:4px;margin-top:3rem;height:2rem}
+.guide span{animation:guideText 10s ease-in-out infinite}
+@keyframes guideText{
+  0%,45%{opacity:0}
+  5%,40%{opacity:1}
+  50%,95%{opacity:0}
+  55%,90%{opacity:1}
+}
+.inhale{animation:inhaleGuide 10s ease-in-out infinite}
+.exhale{animation:exhaleGuide 10s ease-in-out infinite}
+@keyframes inhaleGuide{
+  0%{opacity:0}
+  5%{opacity:1}
+  35%{opacity:1}
+  40%{opacity:0}
+  100%{opacity:0}
+}
+@keyframes exhaleGuide{
+  0%,40%{opacity:0}
+  45%{opacity:1}
+  90%{opacity:1}
+  95%{opacity:0}
+  100%{opacity:0}
+}
+.labels{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
+.label{font-size:0.6rem;letter-spacing:1px;display:flex;align-items:center;gap:4px}
+.label .dot{width:8px;height:8px;border-radius:50%}
+footer{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:2rem 0;border-top:1px solid #1a1a1a;background:#111}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#8C50C8;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<h1>Shield Breath</h1>
+<p class="subtitle">7 rings breathing together</p>
+
+<div class="breath-container">
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+</div>
+
+<div class="guide">
+  <span class="inhale">Inhale...</span>
+  <span class="exhale">Exhale...</span>
+</div>
+
+<div class="labels">
+  <span class="label"><span class="dot" style="background:#B42838"></span> R0 Body</span>
+  <span class="label"><span class="dot" style="background:#E06800"></span> R1 Signal</span>
+  <span class="label"><span class="dot" style="background:#1A8A32"></span> R2 Gate</span>
+  <span class="label"><span class="dot" style="background:#2850A8"></span> R3 Heart</span>
+  <span class="label"><span class="dot" style="background:#C8A820"></span> R4 Voice</span>
+  <span class="label"><span class="dot" style="background:#8C50C8"></span> R5 Mirror</span>
+  <span class="label"><span class="dot" style="background:#888888"></span> R6 Watcher</span>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../../2/">2</a> ·
+    <a href="../../3/">3</a> ·
+    <a href="../../5/">5</a> ·
+    <a href="../../7/">7</a> ·
+    <a href="../../11/">11</a> ·
+    <a href="../../13/" class="current">13</a> ·
+    <a href="../../17/">17</a> ·
+    <a href="../../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+</body>
+</html>

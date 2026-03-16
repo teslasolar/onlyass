@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mersenne Shield — p=13 · OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;overflow-x:hidden}
+::selection{background:#8C50C8;color:#fff}
+a{color:#8C50C8;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+#info{position:absolute;top:2rem;left:50%;transform:translateX(-50%);text-align:center;z-index:10;pointer-events:none}
+#info h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#8C50C8;text-shadow:0 0 30px rgba(140,80,200,0.3)}
+#info p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;margin-top:0.5rem;letter-spacing:2px}
+#info .formula{color:#8C50C8;font-family:'Space Mono',monospace;font-size:0.85rem;margin-top:1rem}
+#canvas-wrap{width:100vw;height:80vh;display:flex;align-items:center;justify-content:center}
+canvas{display:block}
+footer{text-align:center;padding:2rem 0;border-top:1px solid #1a1a1a}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#8C50C8;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<div id="info">
+  <h1>The Mersenne Shield</h1>
+  <p class="formula">2<sup>7</sup> - 1 = 127 dimensions of identity</p>
+  <p>Each vertex is a possible state. Each color is a ring. Drag to rotate.</p>
+</div>
+
+<div id="canvas-wrap"></div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../../2/">2</a> ·
+    <a href="../../3/">3</a> ·
+    <a href="../../5/">5</a> ·
+    <a href="../../7/">7</a> ·
+    <a href="../../11/">11</a> ·
+    <a href="../../13/" class="current">13</a> ·
+    <a href="../../17/">17</a> ·
+    <a href="../../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const RING_COLORS = [
+  0xB42838, // R0 p=2
+  0xE06800, // R1 p=3
+  0x1A8A32, // R2 p=5
+  0x2850A8, // R3 p=7
+  0xC8A820, // R4 p=11
+  0x8C50C8, // R5 p=13
+  0x888888  // R6 p=17
+];
+
+const wrap = document.getElementById('canvas-wrap');
+const W = wrap.clientWidth;
+const H = wrap.clientHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 1000);
+camera.position.z = 3.5;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(window.devicePixelRatio);
+wrap.appendChild(renderer.domElement);
+
+// Generate 127 points on a sphere using golden spiral
+const vertices = [];
+const colors = [];
+const N = 127;
+const goldenRatio = (1 + Math.sqrt(5)) / 2;
+
+for (let i = 0; i < N; i++) {
+  const theta = 2 * Math.PI * i / goldenRatio;
+  const phi = Math.acos(1 - 2 * (i + 0.5) / N);
+  const x = Math.sin(phi) * Math.cos(theta);
+  const y = Math.sin(phi) * Math.sin(theta);
+  const z = Math.cos(phi);
+  vertices.push(x, y, z);
+
+  const ringIndex = i % 7;
+  const c = new THREE.Color(RING_COLORS[ringIndex]);
+  colors.push(c.r, c.g, c.b);
+}
+
+// Points
+const pointGeo = new THREE.BufferGeometry();
+pointGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+pointGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+const pointMat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, sizeAttenuation: true });
+const points = new THREE.Points(pointGeo, pointMat);
+scene.add(points);
+
+// Wireframe sphere approximation — connect nearby vertices
+const linePositions = [];
+const lineColors = [];
+const posArr = pointGeo.attributes.position.array;
+const colArr = pointGeo.attributes.color.array;
+
+for (let i = 0; i < N; i++) {
+  const ax = posArr[i * 3], ay = posArr[i * 3 + 1], az = posArr[i * 3 + 2];
+  for (let j = i + 1; j < N; j++) {
+    const bx = posArr[j * 3], by = posArr[j * 3 + 1], bz = posArr[j * 3 + 2];
+    const dist = Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2 + (az - bz) ** 2);
+    if (dist < 0.45) {
+      linePositions.push(ax, ay, az, bx, by, bz);
+      lineColors.push(colArr[i * 3], colArr[i * 3 + 1], colArr[i * 3 + 2],
+                       colArr[j * 3], colArr[j * 3 + 1], colArr[j * 3 + 2]);
+    }
+  }
+}
+
+const lineGeo = new THREE.BufferGeometry();
+lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+lineGeo.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
+const lineMat = new THREE.LineBasicMaterial({ vertexColors: true, opacity: 0.3, transparent: true });
+const lines = new THREE.LineSegments(lineGeo, lineMat);
+scene.add(lines);
+
+// Mouse interaction
+let isDragging = false;
+let prevMouse = { x: 0, y: 0 };
+let rotVel = { x: 0.003, y: 0.005 };
+
+renderer.domElement.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+renderer.domElement.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  rotVel.y = (e.clientX - prevMouse.x) * 0.005;
+  rotVel.x = (e.clientY - prevMouse.y) * 0.005;
+  prevMouse = { x: e.clientX, y: e.clientY };
+});
+renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
+renderer.domElement.addEventListener('mouseleave', () => { isDragging = false; });
+
+// Touch support
+renderer.domElement.addEventListener('touchstart', e => { isDragging = true; prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
+renderer.domElement.addEventListener('touchmove', e => {
+  if (!isDragging) return;
+  rotVel.y = (e.touches[0].clientX - prevMouse.x) * 0.005;
+  rotVel.x = (e.touches[0].clientY - prevMouse.y) * 0.005;
+  prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+});
+renderer.domElement.addEventListener('touchend', () => { isDragging = false; });
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (!isDragging) {
+    rotVel.x *= 0.98;
+    rotVel.y *= 0.98;
+    rotVel.x = Math.max(rotVel.x, 0.001);
+    rotVel.y = Math.max(rotVel.y, 0.002);
+  }
+  points.rotation.x += rotVel.x;
+  points.rotation.y += rotVel.y;
+  lines.rotation.x = points.rotation.x;
+  lines.rotation.y = points.rotation.y;
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+});
+</script>
+</body>
+</html>

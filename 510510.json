@@ -1,0 +1,35 @@
+{
+  "name": "onlyass.io",
+  "what": "The open source A.S.S.",
+  "stands_for": [
+    "Autonomic Serenade System",
+    "AGI Soul System",
+    "Architectural Stability Standard",
+    "Anonymous Self-Similar",
+    "Axiomatic Seven Shield",
+    "Authentic Signal Source",
+    "All Seven Simultaneous",
+    "Always Start Somewhere",
+    "???",
+    "you decide"
+  ],
+  "fold": 510510,
+  "primes": [2, 3, 5, 7, 11, 13, 17],
+  "directories": {
+    "2":  {"ring": "R0", "name": "ground",  "color": "#B42838", "question": "what are you standing on?"},
+    "3":  {"ring": "R1", "name": "signal",  "color": "#008CC8", "question": "what comes in?"},
+    "5":  {"ring": "R2", "name": "gate",    "color": "#DCA030", "question": "what gets through?"},
+    "7":  {"ring": "R3", "name": "heart",   "color": "#28B450", "question": "what do you feel?"},
+    "11": {"ring": "R4", "name": "voice",   "color": "#5078DC", "question": "what do you decide?"},
+    "13": {"ring": "R5", "name": "mirror",  "color": "#8C50C8", "question": "who are you?"},
+    "17": {"ring": "R6", "name": "watcher", "color": "#787878", "question": "who sees it all?"},
+    "∞":  {"ring": "R7", "name": "network", "color": "#DCA030", "question": "how do you connect?"}
+  },
+  "mersenne": {
+    "M7": 127,
+    "lucas_lehmer": [4, 14, 67, 42, 111, 0],
+    "shield": "2^7 - 1 = prime"
+  },
+  "license": "MIT",
+  "cowbell": true
+}

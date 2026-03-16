@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>audio-sight — vagal phoneme detection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
+::selection{background:#008CC8;color:#fff}
+a{color:#008CC8;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#008CC8;text-align:center;margin-bottom:0.5rem;text-shadow:0 0 30px rgba(0,140,200,0.2)}
+.subtitle{text-align:center;font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:2rem}
+.container{max-width:700px;margin:0 auto}
+canvas{display:block;width:100%;height:200px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;margin:1rem 0}
+.controls{text-align:center;margin:1.5rem 0}
+button{font-family:'Space Mono',monospace;background:#0a0a0a;color:#008CC8;border:1px solid #008CC8;padding:10px 24px;font-size:0.75rem;letter-spacing:2px;cursor:pointer;border-radius:4px;transition:all 0.3s}
+button:hover{background:#008CC8;color:#111}
+button:disabled{opacity:0.3;cursor:not-allowed}
+.meter{margin:1.5rem 0;padding:1rem;background:#0a0a0a;border-radius:4px;border:1px solid #1a1a1a}
+.meter-label{font-size:0.65rem;letter-spacing:4px;color:#444;text-transform:uppercase;margin-bottom:0.5rem}
+.meter-bar{height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden}
+.meter-fill{height:100%;background:#008CC8;border-radius:4px;transition:width 0.1s;width:0%}
+.meter-value{font-size:1.2rem;color:#008CC8;margin-top:0.5rem;text-align:center}
+.freq-display{display:flex;gap:1rem;margin:1rem 0}
+.freq-band{flex:1;padding:0.75rem;background:#0a0a0a;border-radius:4px;border:1px solid #1a1a1a;text-align:center}
+.freq-band .label{font-size:0.55rem;letter-spacing:2px;color:#444;text-transform:uppercase}
+.freq-band .value{font-size:0.9rem;color:#555;margin-top:4px}
+.freq-band.active .value{color:#008CC8}
+.info{margin:2rem 0;font-family:'Inter',sans-serif;font-weight:300;line-height:1.8;font-size:0.8rem;color:#555}
+.info h2{font-family:'Space Mono',monospace;font-size:0.8rem;color:#888;margin:1.5rem 0 0.5rem}
+.info em{color:#008CC8;font-style:normal}
+.vagal-indicator{text-align:center;margin:1rem 0;padding:1.5rem;background:#0a0a0a;border-radius:4px;border:1px solid #1a1a1a}
+.vagal-indicator .state{font-size:0.65rem;letter-spacing:4px;color:#444;text-transform:uppercase}
+.vagal-indicator .reading{font-family:'Creepster',cursive;font-size:2rem;color:#333;margin:0.5rem 0;transition:color 0.3s}
+.vagal-indicator .reading.engaged{color:#008CC8;text-shadow:0 0 20px rgba(0,140,200,0.3)}
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#008CC8;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>audio-sight</h1>
+  <div class="subtitle">vagal phoneme detection engine</div>
+
+  <canvas id="spectrum"></canvas>
+
+  <div class="controls">
+    <button id="startBtn">START LISTENING</button>
+    <button id="stopBtn" disabled>STOP</button>
+  </div>
+
+  <div class="vagal-indicator">
+    <div class="state">vagal engagement</div>
+    <div class="reading" id="vagalReading">--</div>
+  </div>
+
+  <div class="meter">
+    <div class="meter-label">500–2000Hz energy (prosody band)</div>
+    <div class="meter-bar"><div class="meter-fill" id="prosodyFill"></div></div>
+    <div class="meter-value" id="prosodyValue">0%</div>
+  </div>
+
+  <div class="freq-display">
+    <div class="freq-band" id="bandLow">
+      <div class="label">Low (&lt;500Hz)</div>
+      <div class="value">--</div>
+    </div>
+    <div class="freq-band" id="bandMid">
+      <div class="label">Vagal (500–2kHz)</div>
+      <div class="value">--</div>
+    </div>
+    <div class="freq-band" id="bandHigh">
+      <div class="label">High (&gt;2kHz)</div>
+      <div class="value">--</div>
+    </div>
+  </div>
+
+  <div class="info">
+    <h2>What you're seeing</h2>
+    <p>This tool captures your microphone input and displays a real-time frequency spectrum. The <em>vagal tone range</em> — roughly 500 to 2000Hz — is highlighted. This is the frequency band where human voice prosody lives.</p>
+
+    <h2>The vagus nerve and sound</h2>
+    <p>The vagus nerve (cranial nerve X) responds to specific sound frequencies. It shares circuitry with the facial nerve that controls the <em>stapedius muscle</em> in the middle ear — a tiny muscle that tunes your hearing toward or away from human speech.</p>
+    <p>When you feel safe, the stapedius contracts and filters for the prosody band. You hear the melody of speech — the rise and fall that carries emotional information. When you feel threatened, it relaxes, and low-frequency rumble floods in.</p>
+    <p>Voice prosody carries emotional information through these frequencies. A soothing voice activates the <em>social engagement system</em>. The vagus nerve links the ear to the heart, the gut, the face. What you hear changes how your body feels — before you consciously process the words.</p>
+
+    <h2>How to use</h2>
+    <p>Press start and speak, hum, or play music near the microphone. Watch the vagal engagement indicator. Soothing, melodic speech will light up the prosody band. Low rumbles and sharp noises will shift energy away from it.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/">2</a> ·
+    <a href="../3/" class="current">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+(function(){
+  let audioCtx, analyser, source, stream, animId;
+  const canvas = document.getElementById('spectrum');
+  const ctx = canvas.getContext('2d');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const prosodyFill = document.getElementById('prosodyFill');
+  const prosodyValue = document.getElementById('prosodyValue');
+  const vagalReading = document.getElementById('vagalReading');
+  const bandLow = document.getElementById('bandLow').querySelector('.value');
+  const bandMid = document.getElementById('bandMid').querySelector('.value');
+  const bandHigh = document.getElementById('bandHigh').querySelector('.value');
+  const bandLowEl = document.getElementById('bandLow');
+  const bandMidEl = document.getElementById('bandMid');
+  const bandHighEl = document.getElementById('bandHigh');
+
+  function resizeCanvas(){
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  startBtn.addEventListener('click', async function(){
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      draw();
+    } catch(e){
+      alert('Microphone access denied.');
+    }
+  });
+
+  stopBtn.addEventListener('click', function(){
+    cancelAnimationFrame(animId);
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    if(audioCtx) audioCtx.close();
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    vagalReading.textContent = '--';
+    vagalReading.classList.remove('engaged');
+    prosodyFill.style.width = '0%';
+    prosodyValue.textContent = '0%';
+    bandLow.textContent = '--';
+    bandMid.textContent = '--';
+    bandHigh.textContent = '--';
+    bandLowEl.classList.remove('active');
+    bandMidEl.classList.remove('active');
+    bandHighEl.classList.remove('active');
+    ctx.clearRect(0,0,canvas.offsetWidth,canvas.offsetHeight);
+  });
+
+  function draw(){
+    animId = requestAnimationFrame(draw);
+    const bufLen = analyser.frequencyBinCount;
+    const data = new Uint8Array(bufLen);
+    analyser.getByteFrequencyData(data);
+
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    ctx.clearRect(0,0,w,h);
+
+    const sampleRate = audioCtx.sampleRate;
+    const binHz = sampleRate / analyser.fftSize;
+
+    const lowEnd = Math.floor(500 / binHz);
+    const highEnd = Math.ceil(2000 / binHz);
+
+    // draw spectrum
+    const barW = w / bufLen;
+    for(let i=0;i<bufLen;i++){
+      const v = data[i] / 255;
+      const barH = v * h;
+      const inVagal = i >= lowEnd && i <= highEnd;
+      ctx.fillStyle = inVagal ? 'rgba(0,140,200,'+(0.3+v*0.7)+')' : 'rgba(136,136,136,'+(0.1+v*0.4)+')';
+      ctx.fillRect(i*barW, h-barH, barW+0.5, barH);
+    }
+
+    // calculate band energies
+    let lowSum=0, midSum=0, highSum=0;
+    let lowCount=0, midCount=0, highCount=0;
+    for(let i=0;i<bufLen;i++){
+      const freq = i * binHz;
+      if(freq < 500){lowSum+=data[i]; lowCount++;}
+      else if(freq <= 2000){midSum+=data[i]; midCount++;}
+      else{highSum+=data[i]; highCount++;}
+    }
+    const lowAvg = lowCount ? lowSum/lowCount : 0;
+    const midAvg = midCount ? midSum/midCount : 0;
+    const highAvg = highCount ? highSum/highCount : 0;
+    const total = lowAvg + midAvg + highAvg;
+
+    const prosodyPct = total > 0 ? Math.round((midAvg / total) * 100) : 0;
+    prosodyFill.style.width = prosodyPct + '%';
+    prosodyValue.textContent = prosodyPct + '%';
+
+    bandLow.textContent = Math.round(lowAvg);
+    bandMid.textContent = Math.round(midAvg);
+    bandHigh.textContent = Math.round(highAvg);
+
+    bandLowEl.classList.toggle('active', lowAvg > midAvg && lowAvg > highAvg);
+    bandMidEl.classList.toggle('active', midAvg >= lowAvg && midAvg >= highAvg);
+    bandHighEl.classList.toggle('active', highAvg > midAvg && highAvg > lowAvg);
+
+    // vagal engagement indicator
+    if(total > 10){
+      const engagement = midAvg / (lowAvg + 1);
+      if(engagement > 1.2){
+        vagalReading.textContent = 'ENGAGED';
+        vagalReading.classList.add('engaged');
+      } else if(engagement > 0.7){
+        vagalReading.textContent = 'PARTIAL';
+        vagalReading.classList.remove('engaged');
+        vagalReading.style.color = '#555';
+      } else {
+        vagalReading.textContent = 'LOW';
+        vagalReading.classList.remove('engaged');
+        vagalReading.style.color = '#444';
+      }
+    } else {
+      vagalReading.textContent = 'QUIET';
+      vagalReading.classList.remove('engaged');
+      vagalReading.style.color = '#333';
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

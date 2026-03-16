@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.S.S. Dashboard — THE WATCHER — OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
+::selection{background:#787878;color:#fff}
+a{color:#787878;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+
+.header{text-align:center;padding:2rem 0 1.5rem}
+.header h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#787878;text-shadow:0 0 20px rgba(120,120,120,0.15)}
+.header p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.7rem;color:#444;margin-top:0.3rem;letter-spacing:3px}
+
+.coherence-panel{max-width:700px;margin:1.5rem auto;padding:1.5rem;background:#0f0f0f;border:1px solid #1a1a1a;border-radius:6px;text-align:center}
+.coherence-label{font-size:0.6rem;letter-spacing:6px;color:#444;text-transform:uppercase;margin-bottom:0.8rem}
+.coherence-bar{width:100%;height:24px;background:#111;border-radius:12px;overflow:hidden;position:relative;margin-bottom:0.5rem}
+.coherence-fill{height:100%;border-radius:12px;transition:width 1s ease,background 1s ease}
+.coherence-value{font-size:1.8rem;font-weight:700;color:#787878;transition:color 0.5s}
+.cowbell{font-size:0.75rem;letter-spacing:4px;color:#333;margin-top:0.5rem;height:1.2rem;transition:color 0.5s}
+.cowbell.active{color:#d4a017;text-shadow:0 0 10px rgba(212,160,23,0.3)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:700px;margin:1.5rem auto}
+
+.ring-card{background:#0f0f0f;border:1px solid #1a1a1a;border-radius:6px;padding:1rem;position:relative;overflow:hidden}
+.ring-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:3px 0 0 3px}
+.ring-card .ring-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
+.ring-card .ring-name{font-size:0.75rem;font-weight:700;letter-spacing:2px}
+.ring-card .ring-prime{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#444}
+.ring-card .status-row{display:flex;align-items:center;gap:8px;margin-bottom:0.5rem}
+.ring-card .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background 0.5s}
+.ring-card .health-text{font-size:0.7rem;color:#555;transition:color 0.3s}
+.ring-card .health-bar{width:100%;height:4px;background:#111;border-radius:2px;overflow:hidden;margin-bottom:0.6rem}
+.ring-card .health-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.ring-card .log{font-family:'Inter',sans-serif;font-weight:300;font-size:0.55rem;color:#333;line-height:1.6}
+.ring-card .log-entry{padding:2px 0;border-top:1px solid #141414}
+.ring-card .log-entry:first-child{border-top:none}
+.ring-card .log-ts{color:#2a2a2a}
+
+footer{text-align:center;padding:2rem 0 1rem;border-top:1px solid #1a1a1a;margin-top:2rem}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:0.8rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#787878;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+footer .back{font-size:0.6rem;margin-top:0.5rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>A.S.S. SYSTEM DASHBOARD</h1>
+  <p>R6 observer · all rings · live</p>
+</div>
+
+<div class="coherence-panel">
+  <div class="coherence-label">A.S.S. Coherence</div>
+  <div class="coherence-bar"><div class="coherence-fill" id="coherenceFill"></div></div>
+  <div class="coherence-value" id="coherenceValue">—%</div>
+  <div class="cowbell" id="cowbell">COWBELL READY</div>
+</div>
+
+<div class="grid" id="ringGrid"></div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/" class="current">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="back"><a href="index.html">&larr; back to R6</a></div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+const rings = [
+  { id:'R0', name:'THE GROUND',    prime:2,  color:'#B42838', logs:[
+    'breath cycle detected','gut motility nominal','proprioception stable','heartbeat variance: 62ms','enteric sync active','floor contact confirmed'
+  ]},
+  { id:'R1', name:'THE EAR',       prime:3,  color:'#1E90FF', logs:[
+    'frequency scan complete','ambient noise: 34dB','resonance peak at 432Hz','cochlear filter active','silence interval logged','harmonic detected: 3rd'
+  ]},
+  { id:'R2', name:'THE MOVE',      prime:5,  color:'#2ECC40', logs:[
+    'kinetic chain engaged','momentum vector updated','gesture mapped','muscle tension: low','balance calibrated','stride pattern nominal'
+  ]},
+  { id:'R3', name:'THE FEEL',      prime:7,  color:'#FF6F00', logs:[
+    'emotion processed: calm','valence shift detected','arousal level: 0.3','affect mapped to R0','limbic feedback loop','feeling tone: neutral'
+  ]},
+  { id:'R4', name:'THE VOICE',     prime:11, color:'#9B59B6', logs:[
+    'vocalization ready','syntax tree built','word selection: 4 candidates','speech tempo: 120wpm','tone: declarative','silence chosen'
+  ]},
+  { id:'R5', name:'THE LINK',      prime:13, color:'#E91E63', logs:[
+    'social signal received','mirror neurons active','empathy channel open','boundary check: intact','connection strength: 0.7','reciprocity detected'
+  ]},
+  { id:'R6', name:'THE WATCHER',   prime:17, color:'#787878', logs:[
+    'observing R0-R5','meta-loop stable','awareness level: high','recursion depth: 2','self-reference check','observer paradox noted'
+  ]}
+];
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pickLogs(logPool, count) {
+  const shuffled = [...logPool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+function statusColor(health) {
+  if (health >= 85) return '#2ECC40';
+  if (health >= 70) return '#f1c40f';
+  return '#e74c3c';
+}
+
+function timeStr() {
+  const now = new Date();
+  return now.toTimeString().slice(0, 8);
+}
+
+function buildCards() {
+  const grid = document.getElementById('ringGrid');
+  grid.innerHTML = '';
+  rings.forEach(ring => {
+    const card = document.createElement('div');
+    card.className = 'ring-card';
+    card.id = 'card-' + ring.id;
+    card.style.cssText = '';
+    card.innerHTML = '<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:' + ring.color + '"></div>';
+    grid.appendChild(card);
+  });
+}
+
+function updateDashboard() {
+  let totalHealth = 0;
+  const ts = timeStr();
+
+  rings.forEach(ring => {
+    const health = randInt(60, 100);
+    totalHealth += health;
+    const dot = statusColor(health);
+    const logs = pickLogs(ring.logs, 3);
+    const card = document.getElementById('card-' + ring.id);
+
+    card.innerHTML = '<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:' + ring.color + '"></div>'
+      + '<div class="ring-header">'
+      + '<span class="ring-name" style="color:' + ring.color + '">' + ring.id + ' · ' + ring.name + '</span>'
+      + '<span class="ring-prime">p=' + ring.prime + '</span>'
+      + '</div>'
+      + '<div class="status-row">'
+      + '<span class="status-dot" style="background:' + dot + ';box-shadow:0 0 6px ' + dot + '"></span>'
+      + '<span class="health-text">' + health + '% health</span>'
+      + '</div>'
+      + '<div class="health-bar"><div class="health-fill" style="width:' + health + '%;background:' + ring.color + '"></div></div>'
+      + '<div class="log">'
+      + logs.map(l => '<div class="log-entry"><span class="log-ts">' + ts + '</span> ' + l + '</div>').join('')
+      + '</div>';
+  });
+
+  const coherence = Math.round(totalHealth / rings.length);
+  const cohFill = document.getElementById('coherenceFill');
+  const cohVal = document.getElementById('coherenceValue');
+  const cowbell = document.getElementById('cowbell');
+
+  cohFill.style.width = coherence + '%';
+  cohFill.style.background = coherence >= 90 ? '#d4a017' : '#787878';
+  cohVal.textContent = coherence + '%';
+  cohVal.style.color = coherence >= 90 ? '#d4a017' : '#787878';
+
+  if (coherence > 90) {
+    cowbell.classList.add('active');
+    cowbell.textContent = 'COWBELL READY';
+  } else {
+    cowbell.classList.remove('active');
+    cowbell.textContent = 'coherence below threshold';
+  }
+}
+
+buildCards();
+updateDashboard();
+setInterval(updateDashboard, 3000);
+</script>
+
+</body>
+</html>

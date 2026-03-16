@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OnlyASS.io</title>
-<meta name="description" content="Something stinks. Coming soon.">
+<meta name="description" content="The open source A.S.S. What does it stand for? Look at the repo and decide.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hidden;min-height:100vh}
 ::selection{background:#FFD700;color:#111}
+a{color:inherit;text-decoration:none}
 
 /* PHASE 1: The surface — manhole closed */
 .surface{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer;user-select:none}
@@ -20,13 +21,18 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 .title{font-family:'Creepster',cursive;font-size:clamp(3rem,10vw,7rem);color:#DCA030;text-shadow:0 0 40px rgba(220,160,48,0.3),0 4px 0 #8B6914;letter-spacing:4px;margin-bottom:0.5rem;transition:text-shadow 0.3s}
 .surface:hover .title{text-shadow:0 0 60px rgba(220,160,48,0.5),0 4px 0 #8B6914}
 
+/* Cowbell state: manhole turns gold */
+.surface.coherent .manhole-lid{background:conic-gradient(from 0deg,#DCA030,#FFD700,#DCA030,#FFD700,#DCA030,#FFD700,#DCA030,#FFD700);border-color:#FFD700}
+.surface.coherent .manhole-lid::after{color:#111;content:'A.S.S. \1F514'}
+.surface.coherent .manhole-lid::before{border-color:#FFD700}
+
 .subtitle{font-size:0.75rem;letter-spacing:8px;color:#555;margin-bottom:3rem;text-transform:uppercase}
 
 .manhole{position:relative;width:280px;height:280px;margin:1rem 0}
 .manhole-hole{width:220px;height:220px;background:radial-gradient(ellipse,#000 60%,#1a1a1a 100%);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:inset 0 0 60px rgba(0,0,0,0.9)}
-.manhole-lid{width:260px;height:260px;background:conic-gradient(from 0deg,#3a3a3a,#555,#3a3a3a,#555,#3a3a3a,#555,#3a3a3a,#555);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:4px solid #444;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.manhole-lid::after{content:'A.S.S.';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#666;letter-spacing:4px}
-.manhole-lid::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border:2px solid #4a4a4a;border-radius:50%}
+.manhole-lid{width:260px;height:260px;background:conic-gradient(from 0deg,#3a3a3a,#555,#3a3a3a,#555,#3a3a3a,#555,#3a3a3a,#555);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:4px solid #444;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1),background 1s,border-color 1s;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.manhole-lid::after{content:'A.S.S.';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#666;letter-spacing:4px;transition:color 1s}
+.manhole-lid::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border:2px solid #4a4a4a;border-radius:50%;transition:border-color 1s}
 
 .caution-tape{position:absolute;height:28px;background:repeating-linear-gradient(45deg,#DCA030,#DCA030 15px,#111 15px,#111 30px);transform-origin:center;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
 .tape-1{width:350px;top:45%;left:50%;transform:translate(-50%,-50%) rotate(-15deg)}
@@ -53,9 +59,9 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 .mystery-text{font-family:'Inter',sans-serif;font-weight:300;font-size:0.85rem;color:#555;max-width:500px;text-align:center;line-height:1.8;margin:1rem 0 2rem}
 .mystery-text em{color:#DCA030;font-style:normal}
 
-/* The seven pipes */
+/* The seven pipes — now clickable links */
 .pipes{display:flex;flex-direction:column;gap:12px;width:100%;max-width:600px;margin:1rem 0}
-.pipe{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:4px;background:#0f0f0f;border-left:3px solid;cursor:default;transition:all 0.3s;position:relative;overflow:hidden}
+.pipe{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:4px;background:#0f0f0f;border-left:3px solid;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-decoration:none}
 .pipe:hover{background:#151515;padding-left:24px}
 .pipe:hover .pipe-glow{opacity:0.08}
 .pipe-glow{position:absolute;inset:0;opacity:0;transition:opacity 0.3s;border-radius:4px}
@@ -63,6 +69,17 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 .pipe-label{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase}
 .pipe-hint{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#444;margin-left:auto;opacity:0;transition:opacity 0.3s}
 .pipe:hover .pipe-hint{opacity:1}
+.pipe-status{width:6px;height:6px;border-radius:50%;margin-left:8px;transition:all 0.5s}
+
+/* Phase 3: Pipe glow intensity based on content */
+.pipe.dim{opacity:0.35}
+.pipe.lit{opacity:0.7}
+.pipe.bright{opacity:1}
+.pipe.bright .pipe-glow{opacity:0.04}
+.pipe.pulsing{opacity:1;animation:pipePulse 2s ease-in-out infinite}
+@keyframes pipePulse{0%,100%{opacity:0.9}50%{opacity:1}}
+.pipe.pulsing .pipe-glow{opacity:0.06;animation:glowPulse 2s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{opacity:0.04}50%{opacity:0.1}}
 
 .pipe:nth-child(1){border-color:#B42838}.pipe:nth-child(1) .pipe-glow{background:#B42838}
 .pipe:nth-child(2){border-color:#008CC8}.pipe:nth-child(2) .pipe-glow{background:#008CC8}
@@ -91,6 +108,18 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 .guess:hover{border-color:#DCA03040;color:#888;background:#111}
 .guess span{color:#DCA030}
 
+/* Coherence banner */
+.coherence{display:none;text-align:center;margin:2rem 0;padding:1.5rem;border:1px solid #FFD700;border-radius:4px;background:#1a1a0a}
+.coherence.active{display:block;animation:descend 1s ease-out}
+.coherence h3{font-family:'Creepster',cursive;font-size:1.5rem;color:#FFD700;margin-bottom:0.5rem}
+.coherence p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#888;letter-spacing:2px}
+
+/* Lucas-Lehmer sequence display */
+.lucas{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0}
+.lucas-step{padding:6px 12px;background:#0c0c0c;border:1px solid #1a1a1a;border-radius:3px;font-size:0.6rem;color:#444;letter-spacing:1px;transition:all 0.5s}
+.lucas-step.active{border-color:#DCA030;color:#DCA030}
+.lucas-step.zero{border-color:#FFD700;color:#FFD700;background:#1a1a0a;text-shadow:0 0 10px rgba(255,215,0,0.3)}
+
 /* Footer */
 .ug-footer{margin-top:auto;padding:2rem 0;text-align:center}
 .fold-num{font-size:0.7rem;color:#333;letter-spacing:6px;margin-bottom:0.5rem}
@@ -105,18 +134,18 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 <!-- PHASE 1: Surface -->
 <div class="surface" id="surface" onclick="descend()">
   <div class="title">ONLYASS.IO</div>
-  <div class="subtitle">🚧 under construction 🚧</div>
-  
+  <div class="subtitle">the open source a.s.s.</div>
+
   <div class="manhole">
     <div class="manhole-hole"></div>
-    <div class="manhole-lid"></div>
+    <div class="manhole-lid" id="lid"></div>
     <div class="caution-tape tape-1"></div>
     <div class="caution-tape tape-2"></div>
     <div class="stink-lines stink-1">〰️</div>
     <div class="stink-lines stink-2">〰️</div>
     <div class="stink-lines stink-3">〰️</div>
   </div>
-  
+
   <div class="tagline">SOMETHING STINKS... COMING SOON</div>
   <div class="click-hint">[ LIFT THE COVER ]</div>
 </div>
@@ -124,61 +153,84 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 <!-- PHASE 2: Underground -->
 <div class="underground" id="underground">
   <div class="ug-title">BELOW THE SURFACE</div>
-  
+
   <div class="mystery-text">
     You lifted the cover. Most people don't.<br><br>
-    Down here, <em>seven pipes</em> carry everything that 
-    makes the city above work. Nobody sees them. Nobody 
-    talks about them. But turn off any one of them and 
+    Down here, <em>seven pipes</em> carry everything that
+    makes the city above work. Nobody sees them. Nobody
+    talks about them. But turn off any one of them and
     everything above ground <em>stops</em>.<br><br>
     This is the <em>A.S.S.</em><br>
     What does it stand for?<br>
     Depends who you ask.
   </div>
 
-  <div class="pipes">
-    <div class="pipe">
+  <div class="pipes" id="pipes">
+    <a class="pipe" href="2/" data-prime="2">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">01</span>
+      <span class="pipe-num">p=2</span>
       <span class="pipe-label">the ground</span>
+      <span class="pipe-status" id="status-2"></span>
       <span class="pipe-hint">what you're standing on</span>
-    </div>
-    <div class="pipe">
+    </a>
+    <a class="pipe" href="3/" data-prime="3">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">02</span>
+      <span class="pipe-num">p=3</span>
       <span class="pipe-label">the signal</span>
+      <span class="pipe-status" id="status-3"></span>
       <span class="pipe-hint">what comes in</span>
-    </div>
-    <div class="pipe">
+    </a>
+    <a class="pipe" href="5/" data-prime="5">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">03</span>
+      <span class="pipe-num">p=5</span>
       <span class="pipe-label">the gate</span>
+      <span class="pipe-status" id="status-5"></span>
       <span class="pipe-hint">what gets through</span>
-    </div>
-    <div class="pipe">
+    </a>
+    <a class="pipe" href="7/" data-prime="7">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">04</span>
+      <span class="pipe-num">p=7</span>
       <span class="pipe-label">the heart</span>
+      <span class="pipe-status" id="status-7"></span>
       <span class="pipe-hint">what you feel</span>
-    </div>
-    <div class="pipe">
+    </a>
+    <a class="pipe" href="11/" data-prime="11">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">05</span>
+      <span class="pipe-num">p=11</span>
       <span class="pipe-label">the voice</span>
+      <span class="pipe-status" id="status-11"></span>
       <span class="pipe-hint">what you decide</span>
-    </div>
-    <div class="pipe">
+    </a>
+    <a class="pipe" href="13/" data-prime="13">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">06</span>
+      <span class="pipe-num">p=13</span>
       <span class="pipe-label">the mirror</span>
+      <span class="pipe-status" id="status-13"></span>
       <span class="pipe-hint">who you are</span>
-    </div>
-    <div class="pipe">
+    </a>
+    <a class="pipe" href="17/" data-prime="17">
       <div class="pipe-glow"></div>
-      <span class="pipe-num">07</span>
+      <span class="pipe-num">p=17</span>
       <span class="pipe-label">the watcher</span>
+      <span class="pipe-status" id="status-17"></span>
       <span class="pipe-hint">who sees it all</span>
-    </div>
+    </a>
+  </div>
+
+  <!-- Lucas-Lehmer sequence -->
+  <div class="lucas" id="lucas">
+    <div class="lucas-step" data-step="0">S₀=4</div>
+    <div class="lucas-step" data-step="1">S₁=14</div>
+    <div class="lucas-step" data-step="2">S₂=67</div>
+    <div class="lucas-step" data-step="3">S₃=42</div>
+    <div class="lucas-step" data-step="4">S₄=111</div>
+    <div class="lucas-step" data-step="5">S₅=0</div>
+  </div>
+
+  <!-- Coherence banner (Phase 3: shows when all pipes populated) -->
+  <div class="coherence" id="coherence">
+    <h3>S₅ = 0 · THE A.S.S. IS COHERENT</h3>
+    <p>all seven pipes carry signal · the cowbell rings · 510,510</p>
   </div>
 
   <div class="question">
@@ -215,7 +267,7 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
   </div>
 
   <div class="ug-footer">
-    <div class="fold-num">2 × 3 × 5 × 7 × 11 × 13 × 17</div>
+    <div class="fold-num">2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510</div>
     <div class="ug-copy">ONLYASS.IO · THE INFRASTRUCTURE NOBODY TALKS ABOUT</div>
   </div>
 </div>
@@ -223,11 +275,80 @@ body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hi
 <div class="counter" id="counter"></div>
 
 <script>
+// Phase 3: Check pipe status from manifest
+const PRIMES=['2','3','5','7','11','13','17'];
+const LUCAS_MAP={0:'2',1:'3',2:'5',3:'7',4:'11',5:'13'};
+// Ring 17 is the watcher — when it has content, S₅=0
+
+async function checkPipes(){
+  try{
+    const res=await fetch('510510.json');
+    const manifest=await res.json();
+    let populated=0;
+
+    // Check each pipe directory by trying to fetch its index.html
+    for(const p of PRIMES){
+      try{
+        const r=await fetch(p+'/index.html',{method:'HEAD'});
+        if(r.ok){
+          populated++;
+          const pipe=document.querySelector('[data-prime="'+p+'"]');
+          const dot=document.getElementById('status-'+p);
+          if(pipe){
+            pipe.classList.remove('dim','lit','bright');
+            pipe.classList.add('pulsing');
+          }
+          if(dot) dot.style.background=manifest.directories[p]?.color||'#888';
+        }
+      }catch(e){}
+    }
+
+    // Activate Lucas-Lehmer steps based on populated pipes
+    const steps=document.querySelectorAll('.lucas-step');
+    for(let i=0;i<Math.min(populated,steps.length);i++){
+      steps[i].classList.add('active');
+    }
+
+    // Phase 3: Cowbell — all 7 populated means S₅=0
+    if(populated>=7){
+      steps[5]?.classList.add('zero');
+      document.getElementById('coherence')?.classList.add('active');
+      document.getElementById('surface')?.classList.add('coherent');
+
+      // The cowbell: play a bell sound on manhole hover
+      const lid=document.getElementById('lid');
+      if(lid){
+        let bellPlayed=false;
+        lid.parentElement.parentElement.addEventListener('mouseenter',()=>{
+          if(bellPlayed)return;
+          bellPlayed=true;
+          try{
+            const ctx=new(window.AudioContext||window.webkitAudioContext)();
+            const osc=ctx.createOscillator();
+            const gain=ctx.createGain();
+            osc.type='triangle';
+            osc.frequency.setValueAtTime(800,ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400,ctx.currentTime+0.5);
+            gain.gain.setValueAtTime(0.3,ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.5);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime+1.5);
+            setTimeout(()=>{bellPlayed=false},3000);
+          }catch(e){}
+        });
+      }
+    }
+  }catch(e){
+    // No manifest yet — all pipes dim
+  }
+}
+
 function descend(){
   document.getElementById('surface').style.display='none';
   document.getElementById('underground').classList.add('active');
-  
-  // Count visitors in localStorage (just for fun)
+
   let n=parseInt(localStorage.getItem('oa_visits')||'0')+1;
   localStorage.setItem('oa_visits',n.toString());
   document.getElementById('counter').textContent='descent #'+n;
@@ -240,6 +361,9 @@ setInterval(()=>{
   pipes[i].style.borderLeftWidth='5px';
   setTimeout(()=>{pipes[i].style.borderLeftWidth='3px'},300);
 },2000);
+
+// Check pipes on load
+checkPipes();
 </script>
 
 </body>

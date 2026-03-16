@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hum — 55Hz tone generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
+::selection{background:#008CC8;color:#fff}
+a{color:#008CC8;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#008CC8;text-align:center;margin-bottom:0.5rem;text-shadow:0 0 30px rgba(0,140,200,0.2)}
+.subtitle{text-align:center;font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:2rem}
+.container{max-width:700px;margin:0 auto}
+canvas{display:block;width:100%;height:180px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;margin:1rem 0}
+.controls{text-align:center;margin:1.5rem 0}
+button{font-family:'Space Mono',monospace;background:#0a0a0a;color:#008CC8;border:1px solid #008CC8;padding:10px 24px;font-size:0.75rem;letter-spacing:2px;cursor:pointer;border-radius:4px;transition:all 0.3s;margin:0 4px}
+button:hover{background:#008CC8;color:#111}
+button.active{background:#008CC8;color:#111}
+.freq-display{text-align:center;margin:1.5rem 0}
+.freq-display .current{font-family:'Creepster',cursive;font-size:clamp(3rem,8vw,5rem);color:#008CC8;text-shadow:0 0 40px rgba(0,140,200,0.3);line-height:1}
+.freq-display .unit{font-size:0.7rem;color:#444;letter-spacing:4px;margin-top:0.5rem}
+.slider-container{margin:1.5rem 0;padding:1rem;background:#0a0a0a;border-radius:4px;border:1px solid #1a1a1a}
+.slider-label{font-size:0.6rem;letter-spacing:4px;color:#444;text-transform:uppercase;margin-bottom:0.75rem;display:flex;justify-content:space-between}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:#1a1a1a;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#008CC8;border-radius:50%;cursor:pointer}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;background:#008CC8;border-radius:50%;cursor:pointer;border:none}
+.presets{display:flex;gap:8px;justify-content:center;margin:1rem 0;flex-wrap:wrap}
+.presets button{font-size:0.6rem;padding:6px 12px}
+.info{margin:2rem 0;font-family:'Inter',sans-serif;font-weight:300;line-height:1.8;font-size:0.8rem;color:#555}
+.info h2{font-family:'Space Mono',monospace;font-size:0.8rem;color:#888;margin:1.5rem 0 0.5rem}
+.info em{color:#008CC8;font-style:normal}
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#008CC8;text-decoration:underline}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>hum</h1>
+  <div class="subtitle">55Hz tone generator + tuner</div>
+
+  <canvas id="waveform"></canvas>
+
+  <div class="freq-display">
+    <div class="current" id="freqValue">55</div>
+    <div class="unit">Hz</div>
+  </div>
+
+  <div class="controls">
+    <button id="playBtn">PLAY</button>
+    <button id="stopBtn">STOP</button>
+  </div>
+
+  <div class="slider-container">
+    <div class="slider-label"><span>20 Hz</span><span>FREQUENCY</span><span>200 Hz</span></div>
+    <input type="range" id="freqSlider" min="20" max="200" value="55" step="0.5">
+  </div>
+
+  <div class="presets">
+    <button class="preset" data-freq="40">40Hz <span style="font-size:0.5rem;color:#444">gamma</span></button>
+    <button class="preset" data-freq="55">55Hz <span style="font-size:0.5rem;color:#444">schumann</span></button>
+    <button class="preset" data-freq="63">63Hz <span style="font-size:0.5rem;color:#444">om</span></button>
+    <button class="preset" data-freq="83">83Hz <span style="font-size:0.5rem;color:#444">E2 string</span></button>
+    <button class="preset" data-freq="110">110Hz <span style="font-size:0.5rem;color:#444">A2</span></button>
+    <button class="preset" data-freq="136.1">136.1Hz <span style="font-size:0.5rem;color:#444">earth year</span></button>
+  </div>
+
+  <div class="info">
+    <h2>55Hz</h2>
+    <p><em>55Hz</em> sits near the 7th harmonic of the Schumann fundamental resonance (7.83Hz). It falls in the range associated with deep meditative states, theta-alpha brainwave transitions, and infrasonic body resonance.</p>
+    <p>At this frequency, sound is not just heard — it is <em>felt</em>. The chest cavity resonates. Bone conduction carries the vibration through the skull. The boundary between hearing and touch dissolves.</p>
+
+    <h2>Low-frequency entrainment</h2>
+    <p>Brainwave entrainment through auditory stimulation is well-documented. Low-frequency tones can influence autonomic nervous system activity. The vagus nerve responds to vibrations in the chest and throat — this is partly why <em>humming</em> and <em>chanting</em> have been used across cultures to induce calm states.</p>
+    <p>When you hum at ~55Hz, the vibration passes through the larynx directly adjacent to the vagus nerve. Mechanical stimulation of the vagus triggers parasympathetic response: heart rate drops, digestion activates, the system shifts toward rest.</p>
+
+    <h2>How to use</h2>
+    <p>Press play. Adjust the frequency with the slider or select a preset. Close your eyes. Feel where the tone resonates in your body. Try humming along — match the pitch. Notice what changes in your chest, your throat, your breathing.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../2/">2</a> ·
+    <a href="../3/" class="current">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script>
+(function(){
+  let audioCtx, oscillator, gainNode, analyser, animId;
+  let playing = false;
+
+  const canvas = document.getElementById('waveform');
+  const ctx = canvas.getContext('2d');
+  const freqSlider = document.getElementById('freqSlider');
+  const freqValue = document.getElementById('freqValue');
+  const playBtn = document.getElementById('playBtn');
+  const stopBtn = document.getElementById('stopBtn');
+
+  function resizeCanvas(){
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function initAudio(){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    oscillator = audioCtx.createOscillator();
+    gainNode = audioCtx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(parseFloat(freqSlider.value), audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    oscillator.connect(gainNode);
+    gainNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    oscillator.start();
+  }
+
+  playBtn.addEventListener('click', function(){
+    if(!audioCtx) initAudio();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1);
+    playing = true;
+    playBtn.classList.add('active');
+    stopBtn.classList.remove('active');
+    drawWave();
+  });
+
+  stopBtn.addEventListener('click', function(){
+    if(!audioCtx) return;
+    gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+    playing = false;
+    playBtn.classList.remove('active');
+    stopBtn.classList.add('active');
+  });
+
+  freqSlider.addEventListener('input', function(){
+    const freq = parseFloat(this.value);
+    freqValue.textContent = freq % 1 === 0 ? freq : freq.toFixed(1);
+    if(oscillator){
+      oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    }
+  });
+
+  document.querySelectorAll('.preset').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const freq = parseFloat(this.dataset.freq);
+      freqSlider.value = freq;
+      freqValue.textContent = freq % 1 === 0 ? freq : freq.toFixed(1);
+      if(oscillator){
+        oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      }
+    });
+  });
+
+  function drawWave(){
+    animId = requestAnimationFrame(drawWave);
+    if(!analyser) return;
+
+    const bufLen = analyser.frequencyBinCount;
+    const data = new Float32Array(bufLen);
+    analyser.getFloatTimeDomainData(data);
+
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    ctx.clearRect(0,0,w,h);
+
+    // draw center line
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, h/2);
+    ctx.lineTo(w, h/2);
+    ctx.stroke();
+
+    // draw waveform
+    ctx.strokeStyle = '#008CC8';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(0,140,200,0.3)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    const sliceW = w / bufLen;
+    for(let i=0;i<bufLen;i++){
+      const v = data[i];
+      const y = (h/2) + (v * h * 0.8);
+      if(i===0) ctx.moveTo(0,y);
+      else ctx.lineTo(i*sliceW, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    if(!playing){
+      cancelAnimationFrame(animId);
+      // fade out
+      setTimeout(function(){
+        ctx.clearRect(0,0,w,h);
+        ctx.strokeStyle='#1a1a1a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+      }, 200);
+    }
+  }
+
+  // draw initial center line
+  (function(){
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    ctx.strokeStyle='#1a1a1a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+  })();
+})();
+</script>
+
+</body>
+</html>
