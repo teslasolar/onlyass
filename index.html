@@ -2,59 +2,245 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ONLYASS.IO</title>
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Mono&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnlyASS.io</title>
+<meta name="description" content="Something stinks. Coming soon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1a1a1a;color:#fff;font-family:'Space Mono',monospace;overflow:hidden;text-align:center}
-h1{font-family:'Bangers',cursive;font-size:clamp(3rem,10vw,7rem);letter-spacing:.05em;color:#ffcc00;text-shadow:3px 3px 0 #000,0 0 30px rgba(255,204,0,.3);margin-bottom:.2em}
-.sub{font-size:clamp(.9rem,2.5vw,1.4rem);color:#ff6600;text-transform:uppercase;letter-spacing:.3em;animation:blink 1.2s steps(1) infinite;margin-bottom:2rem}
-@keyframes blink{50%{opacity:.3}}
-.manhole{position:relative;width:clamp(200px,50vw,360px);aspect-ratio:1}
-.manhole svg{width:100%;height:100%;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6))}
-.tape{position:absolute;width:140%;height:38px;background:repeating-linear-gradient(45deg,#ffcc00 0 18px,#111 18px 36px);left:-20%;opacity:.92;box-shadow:0 2px 8px rgba(0,0,0,.5)}
-.tape.t1{top:18%;transform:rotate(-18deg)}
-.tape.t2{bottom:22%;transform:rotate(12deg)}
-.tape.t3{top:48%;transform:rotate(-4deg)}
-.footer{margin-top:2.5rem;font-size:.75rem;color:#555;letter-spacing:.15em}
-.stink{position:absolute;font-size:2rem;animation:float 2.5s ease-in-out infinite}
-.stink:nth-child(1){top:-10%;left:30%;animation-delay:0s}
-.stink:nth-child(2){top:-15%;left:55%;animation-delay:.8s}
-.stink:nth-child(3){top:-8%;left:42%;animation-delay:1.6s}
-@keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:.7}50%{transform:translateY(-20px) scale(1.2);opacity:1}}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;overflow-x:hidden;min-height:100vh}
+::selection{background:#FFD700;color:#111}
+
+/* PHASE 1: The surface — manhole closed */
+.surface{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer;user-select:none}
+.surface:hover .manhole-lid{transform:rotate(5deg) translateY(-8px);filter:drop-shadow(0 12px 30px rgba(255,200,0,0.15))}
+.surface:hover .stink-lines{opacity:0.6}
+
+.title{font-family:'Creepster',cursive;font-size:clamp(3rem,10vw,7rem);color:#DCA030;text-shadow:0 0 40px rgba(220,160,48,0.3),0 4px 0 #8B6914;letter-spacing:4px;margin-bottom:0.5rem;transition:text-shadow 0.3s}
+.surface:hover .title{text-shadow:0 0 60px rgba(220,160,48,0.5),0 4px 0 #8B6914}
+
+.subtitle{font-size:0.75rem;letter-spacing:8px;color:#555;margin-bottom:3rem;text-transform:uppercase}
+
+.manhole{position:relative;width:280px;height:280px;margin:1rem 0}
+.manhole-hole{width:220px;height:220px;background:radial-gradient(ellipse,#000 60%,#1a1a1a 100%);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:inset 0 0 60px rgba(0,0,0,0.9)}
+.manhole-lid{width:260px;height:260px;background:conic-gradient(from 0deg,#3a3a3a,#555,#3a3a3a,#555,#3a3a3a,#555,#3a3a3a,#555);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:4px solid #444;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.manhole-lid::after{content:'A.S.S.';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#666;letter-spacing:4px}
+.manhole-lid::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border:2px solid #4a4a4a;border-radius:50%}
+
+.caution-tape{position:absolute;height:28px;background:repeating-linear-gradient(45deg,#DCA030,#DCA030 15px,#111 15px,#111 30px);transform-origin:center;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
+.tape-1{width:350px;top:45%;left:50%;transform:translate(-50%,-50%) rotate(-15deg)}
+.tape-2{width:300px;top:55%;left:50%;transform:translate(-50%,-50%) rotate(20deg)}
+
+.stink-lines{position:absolute;top:20%;opacity:0.2;transition:opacity 0.5s;font-size:2rem;animation:float 3s ease-in-out infinite}
+.stink-1{left:45%;animation-delay:0s}
+.stink-2{left:50%;animation-delay:0.7s}
+.stink-3{left:55%;animation-delay:1.4s}
+@keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:0.2}50%{transform:translateY(-15px) scale(1.1);opacity:0.4}}
+
+.tagline{margin-top:3rem;font-size:0.65rem;letter-spacing:6px;color:#444}
+
+.click-hint{position:absolute;bottom:2rem;font-size:0.6rem;letter-spacing:4px;color:#333;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:0.8}}
+
+/* PHASE 2: The descent — after click */
+.underground{display:none;min-height:100vh;flex-direction:column;align-items:center;padding:2rem;position:relative;background:linear-gradient(180deg,#0a0a0a 0%,#080810 50%,#0a0808 100%)}
+.underground.active{display:flex;animation:descend 1.5s ease-out}
+@keyframes descend{0%{opacity:0;transform:translateY(-50px)}100%{opacity:1;transform:translateY(0)}}
+
+.ug-title{font-family:'Creepster',cursive;font-size:clamp(2rem,6vw,4rem);color:#DCA030;text-shadow:0 0 30px rgba(220,160,48,0.2);margin:2rem 0 0.5rem}
+
+.mystery-text{font-family:'Inter',sans-serif;font-weight:300;font-size:0.85rem;color:#555;max-width:500px;text-align:center;line-height:1.8;margin:1rem 0 2rem}
+.mystery-text em{color:#DCA030;font-style:normal}
+
+/* The seven pipes */
+.pipes{display:flex;flex-direction:column;gap:12px;width:100%;max-width:600px;margin:1rem 0}
+.pipe{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:4px;background:#0f0f0f;border-left:3px solid;cursor:default;transition:all 0.3s;position:relative;overflow:hidden}
+.pipe:hover{background:#151515;padding-left:24px}
+.pipe:hover .pipe-glow{opacity:0.08}
+.pipe-glow{position:absolute;inset:0;opacity:0;transition:opacity 0.3s;border-radius:4px}
+.pipe-num{font-size:0.65rem;font-weight:700;opacity:0.4;min-width:20px}
+.pipe-label{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase}
+.pipe-hint{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#444;margin-left:auto;opacity:0;transition:opacity 0.3s}
+.pipe:hover .pipe-hint{opacity:1}
+
+.pipe:nth-child(1){border-color:#B42838}.pipe:nth-child(1) .pipe-glow{background:#B42838}
+.pipe:nth-child(2){border-color:#008CC8}.pipe:nth-child(2) .pipe-glow{background:#008CC8}
+.pipe:nth-child(3){border-color:#DCA030}.pipe:nth-child(3) .pipe-glow{background:#DCA030}
+.pipe:nth-child(4){border-color:#28B450}.pipe:nth-child(4) .pipe-glow{background:#28B450}
+.pipe:nth-child(5){border-color:#5078DC}.pipe:nth-child(5) .pipe-glow{background:#5078DC}
+.pipe:nth-child(6){border-color:#8C50C8}.pipe:nth-child(6) .pipe-glow{background:#8C50C8}
+.pipe:nth-child(7){border-color:#787878}.pipe:nth-child(7) .pipe-glow{background:#787878}
+
+.pipe:nth-child(1) .pipe-label{color:#B42838}
+.pipe:nth-child(2) .pipe-label{color:#008CC8}
+.pipe:nth-child(3) .pipe-label{color:#DCA030}
+.pipe:nth-child(4) .pipe-label{color:#28B450}
+.pipe:nth-child(5) .pipe-label{color:#5078DC}
+.pipe:nth-child(6) .pipe-label{color:#8C50C8}
+.pipe:nth-child(7) .pipe-label{color:#787878}
+
+/* The question */
+.question{margin:2.5rem 0 1rem;text-align:center}
+.question-main{font-family:'Creepster',cursive;font-size:clamp(1.2rem,3vw,1.8rem);color:#DCA030}
+.question-sub{font-family:'Inter',sans-serif;font-weight:300;font-size:0.7rem;color:#444;margin-top:0.5rem;letter-spacing:2px}
+
+/* The acronym guesses */
+.guesses{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;width:100%;max-width:600px;margin:1rem 0 2rem}
+.guess{padding:10px 14px;background:#0c0c0c;border:1px solid #1a1a1a;border-radius:3px;font-size:0.6rem;color:#444;letter-spacing:2px;text-align:center;transition:all 0.3s;cursor:default}
+.guess:hover{border-color:#DCA03040;color:#888;background:#111}
+.guess span{color:#DCA030}
+
+/* Footer */
+.ug-footer{margin-top:auto;padding:2rem 0;text-align:center}
+.fold-num{font-size:0.7rem;color:#333;letter-spacing:6px;margin-bottom:0.5rem}
+.ug-copy{font-size:0.55rem;color:#222;letter-spacing:3px}
+
+/* The counter */
+.counter{position:fixed;bottom:1rem;right:1rem;font-size:0.5rem;color:#222;letter-spacing:2px}
 </style>
 </head>
 <body>
-<h1>ONLYASS.IO</h1>
-<p class="sub">🚧 Under Construction 🚧</p>
-<div class="manhole">
-  <div class="stink">💨</div>
-  <div class="stink">💨</div>
-  <div class="stink">💨</div>
-  <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-    <!-- hole -->
-    <ellipse cx="150" cy="160" rx="100" ry="90" fill="#000"/>
-    <ellipse cx="150" cy="160" rx="100" ry="90" fill="none" stroke="#333" stroke-width="8"/>
-    <!-- rim -->
-    <ellipse cx="150" cy="160" rx="110" ry="98" fill="none" stroke="#555" stroke-width="12"/>
-    <!-- cover pushed aside -->
-    <g transform="translate(60,-20) rotate(-25,200,180)">
-      <ellipse cx="200" cy="180" rx="95" ry="85" fill="#444" stroke="#555" stroke-width="4"/>
-      <ellipse cx="200" cy="180" rx="75" ry="67" fill="none" stroke="#555" stroke-width="2"/>
-      <ellipse cx="200" cy="180" rx="55" ry="49" fill="none" stroke="#555" stroke-width="2"/>
-      <line x1="200" y1="100" x2="200" y2="260" stroke="#555" stroke-width="2"/>
-      <line x1="118" y1="180" x2="282" y2="180" stroke="#555" stroke-width="2"/>
-      <rect x="185" y="168" width="30" height="6" rx="3" fill="#666"/>
-    </g>
-    <!-- depth lines -->
-    <line x1="70" y1="170" x2="80" y2="240" stroke="#222" stroke-width="2"/>
-    <line x1="230" y1="170" x2="220" y2="240" stroke="#222" stroke-width="2"/>
-  </svg>
-  <div class="tape t1"></div>
-  <div class="tape t2"></div>
-  <div class="tape t3"></div>
+
+<!-- PHASE 1: Surface -->
+<div class="surface" id="surface" onclick="descend()">
+  <div class="title">ONLYASS.IO</div>
+  <div class="subtitle">🚧 under construction 🚧</div>
+  
+  <div class="manhole">
+    <div class="manhole-hole"></div>
+    <div class="manhole-lid"></div>
+    <div class="caution-tape tape-1"></div>
+    <div class="caution-tape tape-2"></div>
+    <div class="stink-lines stink-1">〰️</div>
+    <div class="stink-lines stink-2">〰️</div>
+    <div class="stink-lines stink-3">〰️</div>
+  </div>
+  
+  <div class="tagline">SOMETHING STINKS... COMING SOON</div>
+  <div class="click-hint">[ LIFT THE COVER ]</div>
 </div>
-<p class="footer">SOMETHING STINKS... COMING SOON</p>
+
+<!-- PHASE 2: Underground -->
+<div class="underground" id="underground">
+  <div class="ug-title">BELOW THE SURFACE</div>
+  
+  <div class="mystery-text">
+    You lifted the cover. Most people don't.<br><br>
+    Down here, <em>seven pipes</em> carry everything that 
+    makes the city above work. Nobody sees them. Nobody 
+    talks about them. But turn off any one of them and 
+    everything above ground <em>stops</em>.<br><br>
+    This is the <em>A.S.S.</em><br>
+    What does it stand for?<br>
+    Depends who you ask.
+  </div>
+
+  <div class="pipes">
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">01</span>
+      <span class="pipe-label">the ground</span>
+      <span class="pipe-hint">what you're standing on</span>
+    </div>
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">02</span>
+      <span class="pipe-label">the signal</span>
+      <span class="pipe-hint">what comes in</span>
+    </div>
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">03</span>
+      <span class="pipe-label">the gate</span>
+      <span class="pipe-hint">what gets through</span>
+    </div>
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">04</span>
+      <span class="pipe-label">the heart</span>
+      <span class="pipe-hint">what you feel</span>
+    </div>
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">05</span>
+      <span class="pipe-label">the voice</span>
+      <span class="pipe-hint">what you decide</span>
+    </div>
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">06</span>
+      <span class="pipe-label">the mirror</span>
+      <span class="pipe-hint">who you are</span>
+    </div>
+    <div class="pipe">
+      <div class="pipe-glow"></div>
+      <span class="pipe-num">07</span>
+      <span class="pipe-label">the watcher</span>
+      <span class="pipe-hint">who sees it all</span>
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="question-main">WHAT DOES A.S.S. STAND FOR?</div>
+    <div class="question-sub">nobody knows for sure. here are some guesses.</div>
+  </div>
+
+  <div class="guesses">
+    <div class="guess"><span>A</span>utonomic <span>S</span>erenade <span>S</span>ystem</div>
+    <div class="guess"><span>A</span>GI <span>S</span>oul <span>S</span>ystem</div>
+    <div class="guess"><span>A</span>rchitectural <span>S</span>tability <span>S</span>tandard</div>
+    <div class="guess"><span>A</span>nonymous <span>S</span>elf-<span>S</span>imilar</div>
+    <div class="guess"><span>A</span>xiomatic <span>S</span>even <span>S</span>hield</div>
+    <div class="guess"><span>A</span>uthentic <span>S</span>ignal <span>S</span>ource</div>
+    <div class="guess"><span>A</span>ll <span>S</span>even <span>S</span>imultaneous</div>
+    <div class="guess"><span>A</span>lways <span>S</span>tart <span>S</span>omewhere</div>
+  </div>
+
+  <div class="mystery-text" style="margin-top:1rem">
+    The truth is: <em>it doesn't matter what it stands for</em>.<br>
+    What matters is what's underneath.<br><br>
+    Seven pipes. Seven colors. Seven layers<br>
+    that run everything you see above ground.<br><br>
+    Your personality runs on it.<br>
+    Your emotions run on it.<br>
+    Your decisions run on it.<br>
+    Your body has been running on it<br>
+    since before you were born.<br><br>
+    <em>Something stinks?</em><br>
+    Good. That means the system is working.<br>
+    The nose is pipe number two.<br>
+    It just told you something is here.<br><br>
+    Welcome underground.
+  </div>
+
+  <div class="ug-footer">
+    <div class="fold-num">2 × 3 × 5 × 7 × 11 × 13 × 17</div>
+    <div class="ug-copy">ONLYASS.IO · THE INFRASTRUCTURE NOBODY TALKS ABOUT</div>
+  </div>
+</div>
+
+<div class="counter" id="counter"></div>
+
+<script>
+function descend(){
+  document.getElementById('surface').style.display='none';
+  document.getElementById('underground').classList.add('active');
+  
+  // Count visitors in localStorage (just for fun)
+  let n=parseInt(localStorage.getItem('oa_visits')||'0')+1;
+  localStorage.setItem('oa_visits',n.toString());
+  document.getElementById('counter').textContent='descent #'+n;
+}
+
+// Subtle ambient effect — pipes pulse slightly
+const pipes=document.querySelectorAll('.pipe');
+setInterval(()=>{
+  const i=Math.floor(Math.random()*7);
+  pipes[i].style.borderLeftWidth='5px';
+  setTimeout(()=>{pipes[i].style.borderLeftWidth='3px'},300);
+},2000);
+</script>
+
 </body>
 </html>
