@@ -3,54 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Schumann Monitor — p=5 · THE GATE</title>
+<title>Schumann Resonance Monitor — OnlyASS.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
 ::selection{background:#DCA030;color:#111}
-a{color:#DCA030;text-decoration:none;transition:opacity 0.3s}a:hover{opacity:0.7}
-h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#DCA030;text-align:center;margin-bottom:0.5rem}
-.sub{text-align:center;font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;margin-bottom:2rem;letter-spacing:2px}
-.resonances{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-.freq{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#0a0a0a;border-radius:4px;border-left:3px solid #DCA030}
-.freq-label{min-width:80px;font-size:0.75rem;color:#DCA030;font-weight:700}
-.freq-bar-wrap{flex:1;height:24px;background:#0f0f0f;border-radius:2px;overflow:hidden;position:relative}
-.freq-bar{height:100%;border-radius:2px;transition:width 0.8s ease;background:linear-gradient(90deg,#DCA030,#FFD700)}
-.freq-val{min-width:60px;text-align:right;font-size:0.65rem;color:#666}
-.freq-name{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#444;min-width:40px}
-.info{max-width:600px;margin:2rem auto;font-family:'Inter',sans-serif;font-weight:300;font-size:0.8rem;color:#555;line-height:1.8;text-align:center}
-.info em{color:#DCA030;font-style:normal}
-canvas{display:block;max-width:700px;width:100%;height:200px;margin:2rem auto;border-radius:4px}
+a{color:#DCA030;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+h1{font-family:'Creepster',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:#DCA030;text-align:center;margin-bottom:0.5rem;text-shadow:0 0 30px rgba(220,160,48,0.2)}
+.subtitle{text-align:center;font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;letter-spacing:2px;margin-bottom:2rem}
+.container{max-width:700px;margin:0 auto}
+.status{text-align:center;font-size:0.6rem;letter-spacing:3px;color:#444;margin-bottom:2rem}
+.status span{color:#DCA030}
+canvas{display:block;width:100%;margin-bottom:2rem;border-radius:4px}
+.freq-labels{display:flex;flex-direction:column;gap:2px;margin-bottom:2rem}
+.freq-row{display:flex;align-items:center;gap:12px;font-size:0.7rem;padding:6px 0}
+.freq-name{width:40px;color:#555;text-align:right}
+.freq-nominal{width:60px;color:#444;font-family:'Inter',sans-serif;font-size:0.6rem}
+.freq-current{color:#DCA030;width:70px;font-variant-numeric:tabular-nums}
+.freq-bar{flex:1;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;position:relative}
+.freq-bar-fill{height:100%;border-radius:4px;transition:width 0.3s ease}
+.explanation{font-family:'Inter',sans-serif;font-weight:300;font-size:0.8rem;color:#555;line-height:1.8;margin-bottom:2rem}
+.explanation em{color:#DCA030;font-style:normal}
+.explanation h2{font-family:'Space Mono',monospace;font-size:0.85rem;color:#888;margin:1.5rem 0 0.5rem}
+.explanation p{margin-bottom:1rem}
 footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem}
 footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
 footer .ring-nav a{margin:0 4px}
+footer .ring-nav a.current{color:#DCA030;text-decoration:underline}
 footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
 </style>
 </head>
 <body>
 
-<h1>SCHUMANN RESONANCE MONITOR</h1>
-<p class="sub">electromagnetic standing waves — the planetary gate</p>
+<h1>Schumann Resonance</h1>
+<div class="subtitle">planetary electromagnetic gate</div>
 
-<div class="resonances" id="resonances"></div>
+<div class="container">
+  <div class="status">MODE: <span>SIMULATED</span> · DATA IS SYNTHETIC · UPDATES EVERY 2s</div>
 
-<canvas id="waveform"></canvas>
+  <canvas id="waveform" height="160"></canvas>
 
-<div class="info">
-  The <em>Schumann resonances</em> are electromagnetic standing waves in the cavity
-  between Earth's surface and the ionosphere. They are the planet's <em>gate frequencies</em> —
-  the electromagnetic boundaries that define what gets through.<br><br>
-  The fundamental frequency of <em>7.83 Hz</em> sits at the boundary between theta and alpha
-  brainwave states — the gate between unconscious processing and conscious awareness.<br><br>
-  This is R2. The gate is not just in your head. It's planetary.
+  <div class="freq-labels" id="freqDisplay"></div>
+
+  <div class="explanation">
+    <h2>What is this?</h2>
+    <p>The space between Earth's surface and the ionosphere forms a resonant cavity — a waveguide approximately 60 km tall that wraps around the entire planet. When lightning strikes (about 50 times per second globally), it excites electromagnetic standing waves in this cavity.</p>
+    <p>These standing waves resonate at specific frequencies. The fundamental mode is approximately <em>7.83 Hz</em>, with harmonics at roughly 14.3, 20.8, 27.3, 33.8, 39, and 45 Hz.</p>
+
+    <h2>The planetary gate</h2>
+    <p>The ionosphere acts as a gate between the electromagnetic chaos of space and the relatively calm electromagnetic environment at Earth's surface. Without this gate, the solar wind and cosmic radiation would make the surface uninhabitable.</p>
+    <p>The Schumann resonances are the <em>ringing frequency of the gate itself</em>. They're what you hear when you tap on the filter between space and ground.</p>
+    <p>The fundamental frequency of 7.83 Hz sits at the boundary between theta and alpha brainwave bands — the transition zone between drowsy meditation and alert awareness. Whether this is coincidence or consequence is an open question.</p>
+
+    <h2>Why it varies</h2>
+    <p>Schumann resonance amplitudes fluctuate with global lightning activity, solar wind conditions, and ionospheric disturbances. The frequencies themselves are remarkably stable, but their power varies. During geomagnetic storms, the gate shakes.</p>
+  </div>
 </div>
 
 <footer>
   <div class="ring-nav">
     <a href="../2/">2</a> ·
     <a href="../3/">3</a> ·
-    <a href="../5/" style="text-decoration:underline">5</a> ·
+    <a href="../5/" class="current">5</a> ·
     <a href="../7/">7</a> ·
     <a href="../11/">11</a> ·
     <a href="../13/">13</a> ·
@@ -61,69 +78,135 @@ footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
 </footer>
 
 <script>
-const SCHUMANN=[
-  {n:1,nominal:7.83,label:'1st',name:'fundamental'},
-  {n:2,nominal:14.3,label:'2nd',name:'harmonic'},
-  {n:3,nominal:20.8,label:'3rd',name:'harmonic'},
-  {n:4,nominal:27.3,label:'4th',name:'harmonic'},
-  {n:5,nominal:33.8,label:'5th',name:'harmonic'},
-  {n:6,nominal:39.0,label:'6th',name:'harmonic'},
-  {n:7,nominal:45.0,label:'7th',name:'harmonic'}
+const nominals = [
+  { n: 1, freq: 7.83,  label: "f\u2081" },
+  { n: 2, freq: 14.3,  label: "f\u2082" },
+  { n: 3, freq: 20.8,  label: "f\u2083" },
+  { n: 4, freq: 27.3,  label: "f\u2084" },
+  { n: 5, freq: 33.8,  label: "f\u2085" },
+  { n: 6, freq: 39.0,  label: "f\u2086" },
+  { n: 7, freq: 45.0,  label: "f\u2087" }
 ];
 
-const container=document.getElementById('resonances');
-SCHUMANN.forEach(s=>{
-  const div=document.createElement('div');
-  div.className='freq';
-  div.innerHTML=`
-    <span class="freq-name">n=${s.n}</span>
-    <span class="freq-label" id="label-${s.n}">${s.nominal.toFixed(2)} Hz</span>
-    <div class="freq-bar-wrap"><div class="freq-bar" id="bar-${s.n}" style="width:${(s.nominal/50)*100}%"></div></div>
-    <span class="freq-val" id="val-${s.n}">${s.label} ${s.name}</span>
+// Build frequency display rows
+const freqDisplay = document.getElementById("freqDisplay");
+nominals.forEach((f, i) => {
+  const row = document.createElement("div");
+  row.className = "freq-row";
+  row.innerHTML = `
+    <span class="freq-name">${f.label}</span>
+    <span class="freq-nominal">${f.freq.toFixed(2)} Hz</span>
+    <span class="freq-current" id="current-${i}">\u2014</span>
+    <div class="freq-bar"><div class="freq-bar-fill" id="bar-${i}" style="width:0%;background:#DCA030"></div></div>
   `;
-  container.appendChild(div);
+  freqDisplay.appendChild(row);
 });
 
-// Simulate slight variations
-function updateFreqs(){
-  SCHUMANN.forEach(s=>{
-    const variation=(Math.random()-0.5)*0.4;
-    const current=s.nominal+variation;
-    document.getElementById('label-'+s.n).textContent=current.toFixed(2)+' Hz';
-    document.getElementById('bar-'+s.n).style.width=((current/50)*100)+'%';
+// Simulated data generation
+let currentValues = nominals.map(f => ({ freq: f.freq, power: 0.5 + Math.random() * 0.3 }));
+
+function simulateUpdate() {
+  currentValues = nominals.map((f, i) => {
+    const prev = currentValues[i];
+    // Frequency drifts slightly around nominal
+    const freqDrift = f.freq + (Math.random() - 0.5) * 0.3;
+    // Power varies more for lower harmonics
+    const powerBase = 1.0 - (i * 0.1);
+    const powerNoise = (Math.random() - 0.5) * 0.3;
+    const power = Math.max(0.1, Math.min(1.0, prev.power * 0.7 + (powerBase + powerNoise) * 0.3));
+    return { freq: freqDrift, power };
+  });
+
+  currentValues.forEach((v, i) => {
+    document.getElementById("current-" + i).textContent = v.freq.toFixed(2) + " Hz";
+    const bar = document.getElementById("bar-" + i);
+    bar.style.width = (v.power * 100) + "%";
+    const alpha = 0.3 + v.power * 0.7;
+    bar.style.background = `rgba(220,160,48,${alpha})`;
   });
 }
-setInterval(updateFreqs,2000);
 
-// Waveform canvas — composite Schumann
-const canvas=document.getElementById('waveform');
-const ctx=canvas.getContext('2d');
-function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight}
-resize();window.addEventListener('resize',resize);
+// Canvas waveform visualization
+const canvas = document.getElementById("waveform");
+const ctx = canvas.getContext("2d");
+let animFrame;
+let time = 0;
 
-let phase=0;
-function drawWave(){
-  ctx.fillStyle='#0a0a0a';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='#DCA030';
-  ctx.lineWidth=1.5;
-  ctx.globalAlpha=0.6;
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
+  canvas.height = 160 * (window.devicePixelRatio || 1);
+  ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+function drawWaveform() {
+  const w = canvas.offsetWidth;
+  const h = 160;
+  ctx.clearRect(0, 0, w, h);
+
+  // Background grid
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 0.5;
+  for (let y = 0; y < h; y += 20) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Draw composite waveform from all 7 harmonics
   ctx.beginPath();
-  for(let x=0;x<canvas.width;x++){
-    let y=0;
-    SCHUMANN.forEach((s,i)=>{
-      const amp=(7-i)*3;
-      y+=amp*Math.sin((x/canvas.width)*Math.PI*2*(s.nominal/7.83)+phase*(i+1)*0.3);
+  ctx.strokeStyle = "#DCA030";
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = "rgba(220,160,48,0.3)";
+  ctx.shadowBlur = 8;
+
+  for (let x = 0; x < w; x++) {
+    let y = 0;
+    currentValues.forEach((v, i) => {
+      const amplitude = v.power * (15 - i * 1.5);
+      y += amplitude * Math.sin((x / w) * v.freq * 2 + time * v.freq * 0.02 + i);
     });
-    const py=canvas.height/2+y;
-    x===0?ctx.moveTo(x,py):ctx.lineTo(x,py);
+    const py = h / 2 + y;
+    if (x === 0) ctx.moveTo(x, py);
+    else ctx.lineTo(x, py);
   }
   ctx.stroke();
-  ctx.globalAlpha=1;
-  phase+=0.02;
-  requestAnimationFrame(drawWave);
+  ctx.shadowBlur = 0;
+
+  // Draw individual harmonics faintly
+  nominals.forEach((f, i) => {
+    const v = currentValues[i];
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(220,160,48,${0.08 + v.power * 0.07})`;
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x < w; x++) {
+      const amplitude = v.power * (12 - i * 1.2);
+      const py = h / 2 + amplitude * Math.sin((x / w) * f.freq * 2 + time * f.freq * 0.02 + i);
+      if (x === 0) ctx.moveTo(x, py);
+      else ctx.lineTo(x, py);
+    }
+    ctx.stroke();
+  });
+
+  // Center line
+  ctx.beginPath();
+  ctx.strokeStyle = "#222";
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(0, h / 2);
+  ctx.lineTo(w, h / 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  time++;
+  animFrame = requestAnimationFrame(drawWaveform);
 }
-drawWave();
+
+drawWaveform();
+setInterval(simulateUpdate, 2000);
+simulateUpdate();
 </script>
 
 </body>
