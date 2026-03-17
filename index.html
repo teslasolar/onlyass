@@ -274,16 +274,24 @@ a{color:inherit;text-decoration:none}
 
 <div class="counter" id="counter"></div>
 
+<script src="logger.js"></script>
 <script>
 // Phase 3: Check pipe status from manifest
 const PRIMES=['2','3','5','7','11','13','17'];
 const LUCAS_MAP={0:'2',1:'3',2:'5',3:'7',4:'11',5:'13'};
 // Ring 17 is the watcher — when it has content, S₅=0
 
+// Init pipe loggers
+const pipeLog={};
+PRIMES.forEach(p=>{pipeLog[p]=ASSLogger.pipe(Number(p))});
+
 async function checkPipes(){
+  const watcher=pipeLog['17'];
   try{
+    watcher.state(null,'fetching_manifest');
     const res=await fetch('510510.json');
     const manifest=await res.json();
+    watcher.state('fetching_manifest','scanning_pipes');
     let populated=0;
 
     // Check each pipe directory by trying to fetch its index.html
@@ -292,6 +300,7 @@ async function checkPipes(){
         const r=await fetch(p+'/index.html',{method:'HEAD'});
         if(r.ok){
           populated++;
+          pipeLog[p].state(null,'alive',{status:r.status});
           const pipe=document.querySelector('[data-prime="'+p+'"]');
           const dot=document.getElementById('status-'+p);
           if(pipe){
@@ -299,8 +308,12 @@ async function checkPipes(){
             pipe.classList.add('pulsing');
           }
           if(dot) dot.style.background=manifest.directories[p]?.color||'#888';
+        }else{
+          pipeLog[p].warn('pipe empty',{status:r.status});
         }
-      }catch(e){}
+      }catch(e){
+        pipeLog[p].error('pipe unreachable',{reason:e.message});
+      }
     }
 
     // Activate Lucas-Lehmer steps based on populated pipes
@@ -309,11 +322,14 @@ async function checkPipes(){
       steps[i].classList.add('active');
     }
 
+    watcher.state('scanning_pipes','evaluated',{populated,total:PRIMES.length});
+
     // Phase 3: Cowbell — all 7 populated means S₅=0
     if(populated>=7){
       steps[5]?.classList.add('zero');
       document.getElementById('coherence')?.classList.add('active');
       document.getElementById('surface')?.classList.add('coherent');
+      ASSLogger.composite([2,3,5,7,11,13,17],'coherence achieved — all pipes alive');
 
       // The cowbell: play a bell sound on manhole hover
       const lid=document.getElementById('lid');
@@ -335,13 +351,16 @@ async function checkPipes(){
             gain.connect(ctx.destination);
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime+1.5);
+            pipeLog['7'].info('cowbell rang');
             setTimeout(()=>{bellPlayed=false},3000);
-          }catch(e){}
+          }catch(e){
+            pipeLog['7'].error('cowbell failed',{reason:e.message});
+          }
         });
       }
     }
   }catch(e){
-    // No manifest yet — all pipes dim
+    watcher.error('manifest fetch failed',{reason:e.message});
   }
 }
 
