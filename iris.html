@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>A.S.S. IRIS — Flower of Life Navigation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Courier New',monospace;user-select:none}
+canvas{display:block;cursor:pointer}
+#info{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;z-index:10}
+#info .name{font-size:clamp(14px,3vw,22px);color:#DCA030;letter-spacing:4px;text-transform:uppercase;transition:all 0.3s;text-shadow:0 0 20px rgba(220,160,48,.3)}
+#info .question{font-size:clamp(10px,1.5vw,13px);color:#555;letter-spacing:2px;margin-top:4px;transition:all 0.3s}
+#info .ring{font-size:10px;color:#333;letter-spacing:3px;margin-top:6px}
+#title{position:fixed;top:20px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;z-index:10}
+#title h1{font-size:clamp(12px,2vw,16px);color:#333;letter-spacing:8px}
+#title .sub{font-size:9px;color:#222;letter-spacing:4px;margin-top:4px}
+#controls{position:fixed;top:20px;right:20px;z-index:10;display:flex;flex-direction:column;gap:6px}
+#controls button{background:transparent;border:1px solid #222;color:#444;padding:6px 12px;border-radius:3px;cursor:pointer;font-family:inherit;font-size:10px;letter-spacing:2px;transition:all 0.3s}
+#controls button:hover{border-color:#DCA030;color:#DCA030}
+#controls button.active{border-color:#DCA030;color:#DCA030;background:rgba(220,160,48,.08)}
+#layer-indicator{position:fixed;left:20px;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;gap:8px}
+.layer-dot{width:8px;height:8px;border-radius:50%;opacity:0.3;cursor:pointer;transition:all 0.3s;border:1px solid transparent}
+.layer-dot:hover{opacity:0.7;transform:scale(1.3)}
+.layer-dot.active{opacity:1;box-shadow:0 0 8px currentColor;border-color:currentColor}
+#fold{position:fixed;bottom:20px;right:20px;font-size:9px;color:#222;letter-spacing:3px;z-index:10}
+</style>
+</head>
+<body>
+
+<div id="title">
+  <h1>A.S.S. IRIS</h1>
+  <div class="sub">flower of life navigation</div>
+</div>
+
+<div id="controls">
+  <button id="btn-iris" class="active" onclick="toggleIris()">IRIS</button>
+  <button id="btn-spin" onclick="toggleSpin()">SPIN</button>
+  <button id="btn-flower" class="active" onclick="toggleFlower()">FLOWER</button>
+  <button id="btn-labels" class="active" onclick="toggleLabels()">LABELS</button>
+</div>
+
+<div id="layer-indicator"></div>
+
+<canvas id="c"></canvas>
+
+<div id="info">
+  <div class="name" id="hover-name">THE A.S.S. HOLE</div>
+  <div class="question" id="hover-q">lift the iris · click a petal</div>
+  <div class="ring" id="hover-ring">2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510</div>
+</div>
+
+<div id="fold">510,510</div>
+
+<script src="logger.js"></script>
+<script>
+const log = ASSLogger.pipe(7); // heart — this is visual/feeling
+
+// ─── Pipe data ───
+const PIPES = [
+  { p:2,  name:'ground',  color:'#B42838', q:'what are you standing on?', ring:'R0', href:'2/' },
+  { p:3,  name:'signal',  color:'#008CC8', q:'what comes in?',            ring:'R1', href:'3/' },
+  { p:5,  name:'gate',    color:'#DCA030', q:'what gets through?',        ring:'R2', href:'5/' },
+  { p:7,  name:'heart',   color:'#28B450', q:'what do you feel?',         ring:'R3', href:'7/' },
+  { p:11, name:'voice',   color:'#5078DC', q:'what do you decide?',       ring:'R4', href:'11/' },
+  { p:13, name:'mirror',  color:'#8C50C8', q:'who are you?',             ring:'R5', href:'13/' },
+  { p:17, name:'watcher', color:'#787878', q:'who sees it all?',          ring:'R6', href:'17/' }
+];
+
+// ─── Canvas setup ───
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, cx, cy, R;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+  R = Math.min(W, H) * 0.28; // radius of petal circles
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ─── State ───
+let irisOpen = 0.35;       // 0 = closed, 1 = full open
+let irisTarget = 0.35;
+let rotation = 0;          // current rotation angle
+let spinSpeed = 0;         // auto-spin
+let hovered = -1;          // -1 = center, 0-6 = petal index
+let showFlower = true;
+let showLabels = true;
+let activeLayer = -1;      // -1 = all, 0-6 = specific layer
+let mouseX = cx, mouseY = cy;
+let isDragging = false;
+let dragStartAngle = 0;
+let dragStartRotation = 0;
+
+// ─── Layer indicator dots ───
+const layerDiv = document.getElementById('layer-indicator');
+// "All" dot
+const allDot = document.createElement('div');
+allDot.className = 'layer-dot active';
+allDot.style.background = '#DCA030';
+allDot.style.color = '#DCA030';
+allDot.title = 'all layers';
+allDot.onclick = () => { activeLayer = -1; updateLayerDots(); };
+layerDiv.appendChild(allDot);
+PIPES.forEach((pipe, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'layer-dot';
+  dot.style.background = pipe.color;
+  dot.style.color = pipe.color;
+  dot.title = `p=${pipe.p} ${pipe.name}`;
+  dot.onclick = () => { activeLayer = activeLayer === i ? -1 : i; updateLayerDots(); };
+  layerDiv.appendChild(dot);
+});
+function updateLayerDots() {
+  const dots = layerDiv.querySelectorAll('.layer-dot');
+  dots[0].classList.toggle('active', activeLayer === -1);
+  PIPES.forEach((_, i) => dots[i + 1].classList.toggle('active', activeLayer === i || activeLayer === -1));
+}
+
+// ─── Controls ───
+function toggleIris() {
+  irisTarget = irisTarget < 0.5 ? 0.85 : 0.2;
+  document.getElementById('btn-iris').classList.toggle('active', irisTarget > 0.5);
+}
+function toggleSpin() {
+  spinSpeed = spinSpeed > 0 ? 0 : 0.002;
+  document.getElementById('btn-spin').classList.toggle('active', spinSpeed > 0);
+}
+function toggleFlower() {
+  showFlower = !showFlower;
+  document.getElementById('btn-flower').classList.toggle('active', showFlower);
+}
+function toggleLabels() {
+  showLabels = !showLabels;
+  document.getElementById('btn-labels').classList.toggle('active', showLabels);
+}
+// Expose to onclick
+window.toggleIris = toggleIris;
+window.toggleSpin = toggleSpin;
+window.toggleFlower = toggleFlower;
+window.toggleLabels = toggleLabels;
+
+// ─── Geometry helpers ───
+function petalCenter(i) {
+  const angle = (i / 7) * Math.PI * 2 + rotation - Math.PI / 2;
+  const dist = R * (0.3 + irisOpen * 0.7);
+  return { x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist, angle };
+}
+
+function hexColor(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ─── Draw flower of life pattern ───
+function drawFlower() {
+  if (!showFlower) return;
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.strokeStyle = '#DCA030';
+  ctx.lineWidth = 0.5;
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, R * 0.6, 0, Math.PI * 2);
+  ctx.stroke();
+  // 6 surrounding circles (classic flower of life)
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + rotation;
+    const x = cx + Math.cos(a) * R * 0.6;
+    const y = cy + Math.sin(a) * R * 0.6;
+    ctx.beginPath();
+    ctx.arc(x, y, R * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Second ring (12 circles)
+  ctx.globalAlpha = 0.03;
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2 + rotation;
+    const x = cx + Math.cos(a) * R * 1.04;
+    const y = cy + Math.sin(a) * R * 1.04;
+    ctx.beginPath();
+    ctx.arc(x, y, R * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Outer ring
+  ctx.globalAlpha = 0.02;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R * 1.6, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── Draw iris blades ───
+function drawIris() {
+  for (let i = 0; i < 7; i++) {
+    if (activeLayer !== -1 && activeLayer !== i) continue;
+
+    const pipe = PIPES[i];
+    const pc = petalCenter(i);
+    const petalR = R * 0.55;
+    const isHovered = hovered === i;
+    const alpha = isHovered ? 0.5 : 0.2;
+    const glowAlpha = isHovered ? 0.15 : 0.04;
+
+    // Petal glow
+    const grad = ctx.createRadialGradient(pc.x, pc.y, 0, pc.x, pc.y, petalR);
+    grad.addColorStop(0, hexColor(pipe.color, glowAlpha * 2));
+    grad.addColorStop(0.6, hexColor(pipe.color, glowAlpha));
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(pc.x, pc.y, petalR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Petal circle — the iris blade
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = pipe.color;
+    ctx.lineWidth = isHovered ? 2.5 : 1.5;
+    ctx.beginPath();
+    ctx.arc(pc.x, pc.y, petalR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Fill with transparency
+    ctx.globalAlpha = isHovered ? 0.12 : 0.04;
+    ctx.fillStyle = pipe.color;
+    ctx.fill();
+    ctx.restore();
+
+    // Vesica piscis intersections — where circles overlap
+    for (let j = i + 1; j < 7; j++) {
+      if (activeLayer !== -1 && activeLayer !== j) continue;
+      const pc2 = petalCenter(j);
+      const dist = Math.hypot(pc.x - pc2.x, pc.y - pc2.y);
+      if (dist < petalR * 1.6) {
+        // Draw intersection glow
+        const mx = (pc.x + pc2.x) / 2;
+        const my = (pc.y + pc2.y) / 2;
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(mx, my, petalR * 0.15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Labels
+    if (showLabels) {
+      const labelDist = R * (0.3 + irisOpen * 0.7);
+      ctx.save();
+      ctx.globalAlpha = isHovered ? 1 : 0.5;
+      ctx.fillStyle = pipe.color;
+      ctx.font = isHovered ? 'bold 12px Courier New' : '10px Courier New';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`p=${pipe.p}`, pc.x, pc.y - 10);
+      ctx.font = isHovered ? '11px Courier New' : '9px Courier New';
+      ctx.fillText(pipe.name, pc.x, pc.y + 6);
+      ctx.restore();
+    }
+  }
+}
+
+// ─── Draw center hole ───
+function drawCenter() {
+  const holeR = R * (0.25 - irisOpen * 0.1);
+  const isHoveredCenter = hovered === -1 && !isDragging;
+
+  // The hole — dark center
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, holeR * 2);
+  grad.addColorStop(0, 'rgba(0,0,0,0.9)');
+  grad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, holeR * 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Center ring
+  ctx.save();
+  ctx.globalAlpha = isHoveredCenter ? 0.6 : 0.2;
+  ctx.strokeStyle = '#DCA030';
+  ctx.lineWidth = isHoveredCenter ? 2 : 1;
+  ctx.beginPath();
+  ctx.arc(cx, cy, holeR, 0, Math.PI * 2);
+  ctx.stroke();
+
+  if (isHoveredCenter) {
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = '#DCA030';
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Center glow
+  if (isHoveredCenter) {
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, holeR);
+    glow.addColorStop(0, 'rgba(220,160,48,0.1)');
+    glow.addColorStop(1, 'rgba(220,160,48,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, holeR, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Center text
+  if (showLabels) {
+    ctx.save();
+    ctx.globalAlpha = isHoveredCenter ? 0.8 : 0.3;
+    ctx.fillStyle = '#DCA030';
+    ctx.font = 'bold 11px Courier New';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('HOLE', cx, cy);
+    ctx.restore();
+  }
+}
+
+// ─── Draw connecting arcs between petals ───
+function drawArcs() {
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.strokeStyle = '#DCA030';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < 7; i++) {
+    if (activeLayer !== -1 && activeLayer !== i) continue;
+    const a = petalCenter(i);
+    const b = petalCenter((i + 1) % 7);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    // Arc through center
+    ctx.quadraticCurveTo(cx, cy, b.x, b.y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ─── Draw radial guide lines ───
+function drawGuides() {
+  ctx.save();
+  ctx.globalAlpha = 0.02;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < 7; i++) {
+    const pc = petalCenter(i);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(pc.x, pc.y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ─── Hit detection ───
+function hitTest(mx, my) {
+  // Check center
+  const holeR = R * (0.25 - irisOpen * 0.1);
+  if (Math.hypot(mx - cx, my - cy) < holeR) return -1;
+
+  // Check petals
+  const petalR = R * 0.55;
+  let closest = -2; // -2 = nothing
+  let closestDist = Infinity;
+  for (let i = 0; i < 7; i++) {
+    if (activeLayer !== -1 && activeLayer !== i) continue;
+    const pc = petalCenter(i);
+    const dist = Math.hypot(mx - pc.x, my - pc.y);
+    if (dist < petalR && dist < closestDist) {
+      closest = i;
+      closestDist = dist;
+    }
+  }
+  return closest;
+}
+
+// ─── Mouse interaction ───
+canvas.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  if (isDragging) {
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+    rotation = dragStartRotation + (angle - dragStartAngle);
+    return;
+  }
+
+  const hit = hitTest(e.clientX, e.clientY);
+  hovered = hit;
+
+  if (hit >= 0) {
+    const pipe = PIPES[hit];
+    document.getElementById('hover-name').textContent = `p=${pipe.p} · ${pipe.name}`;
+    document.getElementById('hover-name').style.color = pipe.color;
+    document.getElementById('hover-q').textContent = pipe.q;
+    document.getElementById('hover-ring').textContent = pipe.ring + ' · click to enter';
+    canvas.style.cursor = 'pointer';
+  } else if (hit === -1) {
+    document.getElementById('hover-name').textContent = 'THE HOLE';
+    document.getElementById('hover-name').style.color = '#DCA030';
+    document.getElementById('hover-q').textContent = 'the center of everything';
+    document.getElementById('hover-ring').textContent = 'click to enter · drag to rotate';
+    canvas.style.cursor = 'pointer';
+  } else {
+    document.getElementById('hover-name').textContent = 'A.S.S. IRIS';
+    document.getElementById('hover-name').style.color = '#DCA030';
+    document.getElementById('hover-q').textContent = 'hover a petal · click to navigate';
+    document.getElementById('hover-ring').textContent = '2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510';
+    canvas.style.cursor = 'default';
+  }
+});
+
+canvas.addEventListener('mousedown', (e) => {
+  const hit = hitTest(e.clientX, e.clientY);
+  if (hit === -2) {
+    // Drag to rotate
+    isDragging = true;
+    dragStartAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+    dragStartRotation = rotation;
+    canvas.style.cursor = 'grabbing';
+  }
+});
+
+canvas.addEventListener('mouseup', () => { isDragging = false; });
+canvas.addEventListener('mouseleave', () => { isDragging = false; hovered = -2; });
+
+canvas.addEventListener('click', (e) => {
+  if (isDragging) return;
+  const hit = hitTest(e.clientX, e.clientY);
+  if (hit >= 0) {
+    log.info('navigate', { pipe: PIPES[hit].p, name: PIPES[hit].name });
+    window.location.href = PIPES[hit].href;
+  } else if (hit === -1) {
+    log.info('navigate', { target: 'hole' });
+    window.location.href = 'hole/';
+  }
+});
+
+// Scroll to open/close iris
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  irisTarget = Math.max(0.05, Math.min(1, irisTarget + e.deltaY * -0.001));
+  document.getElementById('btn-iris').classList.toggle('active', irisTarget > 0.5);
+}, { passive: false });
+
+// Touch support
+let touchStart = null;
+canvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, rotation };
+  }
+});
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (touchStart && e.touches.length === 1) {
+    const dx = e.touches[0].clientX - touchStart.x;
+    rotation = touchStart.rotation + dx * 0.005;
+  }
+}, { passive: false });
+canvas.addEventListener('touchend', (e) => {
+  if (touchStart && e.changedTouches.length === 1) {
+    const t = e.changedTouches[0];
+    const hit = hitTest(t.clientX, t.clientY);
+    if (hit >= 0) window.location.href = PIPES[hit].href;
+    else if (hit === -1) window.location.href = 'hole/';
+  }
+  touchStart = null;
+});
+
+// ─── Animation loop ───
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background subtle radial
+  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 2);
+  bg.addColorStop(0, '#0d0d0d');
+  bg.addColorStop(1, '#0a0a0a');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Animate iris
+  irisOpen += (irisTarget - irisOpen) * 0.06;
+
+  // Auto-spin
+  rotation += spinSpeed;
+
+  // Draw layers back to front
+  drawFlower();
+  drawGuides();
+  drawArcs();
+  drawIris();
+  drawCenter();
+
+  // Subtle breath animation on iris
+  if (spinSpeed === 0 && !isDragging) {
+    irisTarget = irisTarget + Math.sin(Date.now() * 0.0005) * 0.0003;
+    irisTarget = Math.max(0.05, Math.min(1, irisTarget));
+  }
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+log.info('iris initialized');
+ASSLogger.composite([2, 3, 5, 7, 11, 13, 17], 'iris navigation loaded');
+</script>
+</body>
+</html>
