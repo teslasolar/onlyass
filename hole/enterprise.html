@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENTERPRISE LEVEL A-HOLE — OnlyASS.io</title>
+<meta name="description" content="The enterprise-grade A.S.S. scaffold. Seven layers. Seven primes. Full ISA-annihilating topology.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
+::selection{background:#FFD700;color:#111}
+a{color:#DCA030;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+
+header{text-align:center;padding:3rem 0 2rem;border-bottom:2px solid #DCA030;position:relative}
+header .badge{display:inline-block;padding:4px 12px;border:1px solid #FFD700;border-radius:2px;font-size:0.5rem;letter-spacing:6px;color:#FFD700;text-transform:uppercase;margin-bottom:1rem}
+header h1{font-family:'Creepster',cursive;font-size:clamp(1.8rem,5vw,3.2rem);color:#DCA030;text-shadow:0 0 30px rgba(220,160,48,0.2)}
+header .sub{font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;margin-top:0.5rem;letter-spacing:2px}
+header .isa-diss{font-size:0.55rem;color:#333;letter-spacing:4px;margin-top:1rem;font-style:italic}
+
+.intro{max-width:650px;margin:2rem auto;font-family:'Inter',sans-serif;font-weight:300;line-height:1.8;font-size:0.8rem;color:#555;text-align:center}
+.intro em{color:#DCA030;font-style:normal}
+.intro .spec-ref{color:#333;font-size:0.6rem;letter-spacing:2px;margin-top:1rem;display:block}
+
+/* Layer scale */
+.scale{max-width:750px;margin:2rem auto}
+.scale h2{font-size:0.65rem;letter-spacing:8px;color:#444;text-transform:uppercase;margin-bottom:1.5rem;text-align:center}
+
+.layer{border:1px solid #1a1a1a;border-radius:4px;margin-bottom:2px;overflow:hidden;transition:all 0.3s}
+.layer:hover{border-color:#333}
+.layer.open{border-color:#333}
+.layer-head{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background 0.3s;position:relative}
+.layer-head:hover{background:#111}
+.layer-head .l-num{font-size:0.55rem;font-weight:700;min-width:28px;opacity:0.5}
+.layer-head .l-prime{font-weight:700;font-size:0.65rem;min-width:40px}
+.layer-head .l-name{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase}
+.layer-head .l-isa{font-family:'Inter',sans-serif;font-weight:300;font-size:0.55rem;color:#333;margin-left:auto;letter-spacing:2px}
+.layer-head .l-arrow{font-size:0.6rem;color:#333;margin-left:8px;transition:transform 0.3s}
+.layer.open .l-arrow{transform:rotate(90deg)}
+
+.layer-body{display:none;padding:0 16px 16px;border-top:1px solid #1a1a1a}
+.layer.open .layer-body{display:block}
+
+.layer-tree{font-size:0.6rem;line-height:2.2;color:#444;padding:12px 0;white-space:pre;overflow-x:auto}
+.layer-tree .d{color:#DCA030}
+.layer-tree .f{color:#555}
+.layer-tree .c{color:#333;font-style:italic}
+
+.layer-desc{font-family:'Inter',sans-serif;font-weight:300;font-size:0.7rem;color:#555;line-height:1.8;padding:8px 0}
+.layer-desc em{color:#DCA030;font-style:normal}
+
+/* Comparison table */
+.compare{max-width:750px;margin:3rem auto}
+.compare h2{font-size:0.65rem;letter-spacing:8px;color:#444;text-transform:uppercase;margin-bottom:1rem;text-align:center}
+.compare table{width:100%;border-collapse:collapse;font-size:0.6rem}
+.compare th{text-align:left;padding:8px 12px;border-bottom:2px solid #DCA030;color:#DCA030;letter-spacing:3px;text-transform:uppercase;font-weight:700}
+.compare td{padding:8px 12px;border-bottom:1px solid #1a1a1a;color:#555;font-family:'Inter',sans-serif;font-weight:300}
+.compare tr:hover td{background:#0f0f0f}
+.compare .dead{color:#333;text-decoration:line-through}
+.compare .alive{color:#DCA030}
+
+/* Download section */
+.download{max-width:600px;margin:3rem auto;text-align:center}
+.download h2{font-size:0.65rem;letter-spacing:8px;color:#444;text-transform:uppercase;margin-bottom:1rem}
+.dl-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1rem 0}
+.dl-btn{padding:14px 28px;border:2px solid #DCA030;background:transparent;color:#DCA030;font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:3px;cursor:pointer;border-radius:4px;transition:all 0.3s;text-transform:uppercase}
+.dl-btn:hover{background:#DCA030;color:#111}
+.dl-btn.sm{border-color:#555;color:#555;font-size:0.6rem;padding:10px 20px}
+.dl-btn.sm:hover{background:#555;color:#111}
+
+.dl-note{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#333;margin-top:0.5rem;letter-spacing:1px}
+
+/* Stats bar */
+.stats{max-width:750px;margin:2rem auto;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.stat{padding:8px 16px;background:#0c0c0c;border:1px solid #1a1a1a;border-radius:3px;font-size:0.55rem;color:#444;letter-spacing:2px}
+.stat em{color:#DCA030;font-style:normal}
+
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">enterprise edition</div>
+  <h1>ENTERPRISE LEVEL A-HOLE</h1>
+  <div class="sub">the 7-layer enterprise scaffold · ISA eat your heart out</div>
+  <div class="isa-diss">ISA-95 has 5 levels. ISA-88 has 4. We have 7 primes. Do the math.</div>
+</header>
+
+<div class="intro">
+  <p>
+    The <em>Empty Ass</em> gives you the topology. The <em>Enterprise A-Hole</em>
+    gives you the full stack — specs, schemas, state machines, contracts, tests,
+    configs, and monitoring per layer. Every pipe gets its own <em>enterprise-grade</em>
+    subdirectory structure.<br><br>
+    Seven layers. Seven primes. Each layer maps to ISA levels, OSI layers,
+    and the A.S.S. rings simultaneously. Because when your architecture is
+    built on <em>primes</em>, the layers <em>can't interfere</em> —
+    that's not philosophy, that's number theory.
+  </p>
+  <span class="spec-ref">cf. ISA-95 · ISA-88 · OSI 7-Layer · Purdue Model · now this</span>
+</div>
+
+<div class="stats">
+  <div class="stat"><em>7</em> layers</div>
+  <div class="stat"><em>8</em> dirs per layer</div>
+  <div class="stat"><em>~120</em> files</div>
+  <div class="stat"><em>0</em> vendor lock-in</div>
+  <div class="stat"><em>510,510</em> fold ceiling</div>
+</div>
+
+<div class="scale" id="scale">
+  <h2>The Seven Layers</h2>
+</div>
+
+<div class="compare">
+  <h2>Layer Mapping</h2>
+  <table>
+    <tr><th>Prime</th><th>A.S.S.</th><th>ISA-95</th><th>OSI</th><th>Purdue</th><th>This</th></tr>
+    <tr><td style="color:#B42838;font-weight:700">p=2</td><td>Ground</td><td class="dead">L0 Physical</td><td class="dead">L1 Physical</td><td class="dead">L0 Field</td><td class="alive">L0 Field</td></tr>
+    <tr><td style="color:#008CC8;font-weight:700">p=3</td><td>Signal</td><td class="dead">L1 Control</td><td class="dead">L2 Data Link</td><td class="dead">L1 Control</td><td class="alive">L1 Signal</td></tr>
+    <tr><td style="color:#DCA030;font-weight:700">p=5</td><td>Gate</td><td class="dead">L2 Supervisory</td><td class="dead">L3 Network</td><td class="dead">L2 Supervisory</td><td class="alive">L2 Gate</td></tr>
+    <tr><td style="color:#28B450;font-weight:700">p=7</td><td>Heart</td><td class="dead">L3 Operations</td><td class="dead">L4 Transport</td><td class="dead">L3 Operations</td><td class="alive">L3 Core</td></tr>
+    <tr><td style="color:#5078DC;font-weight:700">p=11</td><td>Voice</td><td class="dead">L4 Business</td><td class="dead">L5 Session</td><td class="dead">L3.5 DMZ</td><td class="alive">L4 Decision</td></tr>
+    <tr><td style="color:#8C50C8;font-weight:700">p=13</td><td>Mirror</td><td class="dead">—</td><td class="dead">L6 Presentation</td><td class="dead">L4 Enterprise</td><td class="alive">L5 Identity</td></tr>
+    <tr><td style="color:#787878;font-weight:700">p=17</td><td>Watcher</td><td class="dead">—</td><td class="dead">L7 Application</td><td class="dead">L5 Enterprise</td><td class="alive">L6 Oversight</td></tr>
+  </table>
+</div>
+
+<div class="download">
+  <h2>Dig the Enterprise Hole</h2>
+  <div class="dl-buttons">
+    <button class="dl-btn" onclick="downloadEnterprise()">DOWNLOAD .ZIP</button>
+    <button class="dl-btn sm" onclick="location.href='./'">BASIC HOLE</button>
+  </div>
+  <div class="dl-note">~120 files · full enterprise topology · zero dependencies</div>
+</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../">manhole</a> ·
+    <a href="./">hole</a> ·
+    <a href="../2/">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script src="../logger.js"></script>
+<script>
+const holeLog = ASSLogger.pipe(5); // gate — enterprise is all about what gets through
+
+const LAYERS = [
+  {
+    p: 2, ring: 'R0', name: 'ground', fullName: 'Field Layer',
+    color: '#B42838', q: 'what are you standing on?',
+    isa: 'L0 Process', osi: 'L1 Physical',
+    desc: 'Physical infrastructure. Sensors, actuators, field devices, hardware interfaces. ' +
+          'The literal ground your system stands on. In ISA-95 this is Level 0 — the process itself. ' +
+          'In your body, this is proprioception, interoception, the gut.',
+    subdirs: [
+      { name: 'sensors', desc: 'sensor definitions, input schemas' },
+      { name: 'actuators', desc: 'output definitions, control interfaces' },
+      { name: 'health', desc: 'hardware health checks, watchdogs' }
+    ]
+  },
+  {
+    p: 3, ring: 'R1', name: 'signal', fullName: 'Signal Layer',
+    color: '#008CC8', q: 'what comes in?',
+    isa: 'L1 Sensing & Control', osi: 'L2 Data Link',
+    desc: 'Signal acquisition and basic control loops. PLCs, RTUs, signal conditioning, ' +
+          'noise filtering, A/D conversion. The raw data pipeline before any interpretation. ' +
+          'In your body: the afferent nervous system. Signals flowing in.',
+    subdirs: [
+      { name: 'ingest', desc: 'data ingestion pipelines, protocols' },
+      { name: 'filters', desc: 'noise reduction, signal conditioning' },
+      { name: 'protocols', desc: 'communication protocol definitions' }
+    ]
+  },
+  {
+    p: 5, ring: 'R2', name: 'gate', fullName: 'Supervisory Layer',
+    color: '#DCA030', q: 'what gets through?',
+    isa: 'L2 Supervisory', osi: 'L3 Network',
+    desc: 'Supervisory control and filtering. SCADA, HMI, alarm management. ' +
+          'This layer decides what signals matter and what gets discarded. ' +
+          'The bouncer at the door. In your body: the thalamus, the gatekeeper of sensory input.',
+    subdirs: [
+      { name: 'rules', desc: 'filtering rules, gate logic, policies' },
+      { name: 'alarms', desc: 'alarm definitions, thresholds, escalation' },
+      { name: 'dashboards', desc: 'HMI templates, supervisory views' }
+    ]
+  },
+  {
+    p: 7, ring: 'R3', name: 'heart', fullName: 'Operations Core',
+    color: '#28B450', q: 'what do you feel?',
+    isa: 'L3 Manufacturing Operations', osi: 'L4 Transport',
+    desc: 'The operational core. MES, batch management, scheduling, workflow orchestration. ' +
+          'Where signals become actions and actions become patterns. ' +
+          'In your body: the heart itself — the rhythm that everything synchronizes to.',
+    subdirs: [
+      { name: 'workflows', desc: 'orchestration flows, batch definitions' },
+      { name: 'scheduler', desc: 'task scheduling, priority queues' },
+      { name: 'runtime', desc: 'execution engine, process runtime' }
+    ]
+  },
+  {
+    p: 11, ring: 'R4', name: 'voice', fullName: 'Decision Layer',
+    color: '#5078DC', q: 'what do you decide?',
+    isa: 'L4 Business Planning', osi: 'L5 Session',
+    desc: 'Business logic and decision-making. ERP integration, planning, resource allocation. ' +
+          'Where patterns become decisions and decisions become commitments. ' +
+          'In your body: the prefrontal cortex. The voice that says "this is what we do."',
+    subdirs: [
+      { name: 'logic', desc: 'business rules, decision trees' },
+      { name: 'planning', desc: 'resource planning, capacity models' },
+      { name: 'integrations', desc: 'ERP connectors, external APIs' }
+    ]
+  },
+  {
+    p: 13, ring: 'R5', name: 'mirror', fullName: 'Identity & Governance',
+    color: '#8C50C8', q: 'who are you?',
+    isa: '— (beyond ISA)', osi: 'L6 Presentation',
+    desc: 'Identity, governance, compliance, and self-reflection. Who is this system? ' +
+          'What are its boundaries? What does it refuse to do? ISA-95 doesn\'t have this layer. ' +
+          'That\'s why ISA-95 systems have no soul. In your body: the mirror neurons, the self-model.',
+    subdirs: [
+      { name: 'identity', desc: 'system identity, auth, boundaries' },
+      { name: 'governance', desc: 'compliance rules, audit trails' },
+      { name: 'reflection', desc: 'self-assessment, introspection hooks' }
+    ]
+  },
+  {
+    p: 17, ring: 'R6', name: 'watcher', fullName: 'Oversight & Meta',
+    color: '#787878', q: 'who sees it all?',
+    isa: '— (beyond ISA)', osi: 'L7 Application',
+    desc: 'The watcher. Observability, analytics, meta-cognition, the layer that watches all other layers. ' +
+          'ISA-95 doesn\'t have this either. OSI calls it "Application" which is laughably vague. ' +
+          'In your body: consciousness itself — the awareness that you are aware.',
+    subdirs: [
+      { name: 'observability', desc: 'metrics, traces, log aggregation' },
+      { name: 'analytics', desc: 'pattern detection, anomaly analysis' },
+      { name: 'meta', desc: 'meta-state, system-of-systems oversight' }
+    ]
+  }
+];
+
+// Common subdirs every layer gets
+const COMMON_DIRS = [
+  { name: 'specs', desc: 'API contracts, interface definitions' },
+  { name: 'schemas', desc: 'data models, validation schemas' },
+  { name: 'states', desc: 'state machine definitions (prime-factored IDs)' },
+  { name: 'tests', desc: 'test stubs, validation suites' },
+  { name: 'config', desc: 'layer configuration, env templates' }
+];
+
+// Render layers
+const scaleEl = document.getElementById('scale');
+LAYERS.forEach((layer, idx) => {
+  const allDirs = [...layer.subdirs, ...COMMON_DIRS];
+  let tree = `<span class="d">${layer.p}/</span>\n`;
+  tree += `├── <span class="f">index.html</span>       <span class="c">← ring page</span>\n`;
+  tree += `├── <span class="f">README.md</span>        <span class="c">← layer docs</span>\n`;
+  allDirs.forEach((d, i) => {
+    const last = i === allDirs.length - 1;
+    tree += `${last ? '└' : '├'}── <span class="d">${d.name}/</span>         <span class="c">← ${d.desc}</span>\n`;
+    tree += `${last ? ' ' : '│'}   ├── <span class="f">README.md</span>\n`;
+    tree += `${last ? ' ' : '│'}   └── <span class="f">.gitkeep</span>\n`;
+  });
+
+  const el = document.createElement('div');
+  el.className = 'layer';
+  el.innerHTML = `
+    <div class="layer-head" onclick="this.parentElement.classList.toggle('open')">
+      <span class="l-num">L${idx}</span>
+      <span class="l-prime" style="color:${layer.color}">p=${layer.p}</span>
+      <span class="l-name" style="color:${layer.color}">${layer.fullName}</span>
+      <span class="l-isa">${layer.isa} → ${layer.osi}</span>
+      <span class="l-arrow">▶</span>
+    </div>
+    <div class="layer-body">
+      <div class="layer-desc">${layer.desc}</div>
+      <div class="layer-tree">${tree}</div>
+    </div>`;
+  scaleEl.appendChild(el);
+});
+
+// --- Enterprise ZIP generator ---
+function downloadEnterprise() {
+  holeLog.info('enterprise zip initiated');
+  try {
+    const files = buildEnterpriseFiles();
+    const blob = createZipBlob(files);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'enterprise-level-a-hole.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+    holeLog.info('enterprise zip downloaded', { fileCount: files.length });
+  } catch (e) {
+    holeLog.error('enterprise zip failed', { reason: e.message });
+  }
+}
+
+function buildEnterpriseFiles() {
+  const ROOT = 'enterprise-ass';
+  const files = [];
+
+  // Manifest
+  const manifest = {
+    name: ROOT,
+    what: 'Enterprise Level A-Hole',
+    edition: 'enterprise',
+    fold: 510510,
+    primes: [2, 3, 5, 7, 11, 13, 17],
+    directories: {},
+    layers: {},
+    license: 'MIT',
+    cowbell: true
+  };
+  LAYERS.forEach(l => {
+    manifest.directories[l.p] = { ring: l.ring, name: l.name, color: l.color, question: l.q };
+    manifest.layers['L' + LAYERS.indexOf(l)] = {
+      prime: l.p,
+      name: l.fullName,
+      isa: l.isa,
+      osi: l.osi,
+      subdirs: [...l.subdirs.map(s => s.name), ...COMMON_DIRS.map(s => s.name)]
+    };
+  });
+  files.push({ path: `${ROOT}/510510.json`, content: JSON.stringify(manifest, null, 2) });
+
+  // Root README
+  let readme = `# ${ROOT}\n\nEnterprise Level A-Hole — 7-layer A.S.S. scaffold.\n\n`;
+  readme += `## Layers\n\n`;
+  readme += `| L | Prime | Name | ISA-95 | OSI |\n|---|-------|------|--------|-----|\n`;
+  LAYERS.forEach((l, i) => {
+    readme += `| L${i} | p=${l.p} | ${l.fullName} | ${l.isa} | ${l.osi} |\n`;
+  });
+  readme += `\n2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510\n\n`;
+  readme += `## Per-layer structure\n\nEvery layer gets:\n`;
+  readme += `- \`specs/\` — API contracts\n- \`schemas/\` — data models\n`;
+  readme += `- \`states/\` — state machine defs (prime-factored IDs via logger.js)\n`;
+  readme += `- \`tests/\` — test stubs\n- \`config/\` — configuration\n`;
+  readme += `\nPlus layer-specific subdirs. See each layer's README.\n`;
+  files.push({ path: `${ROOT}/README.md`, content: readme });
+
+  // Logger stub
+  files.push({ path: `${ROOT}/logger.js`, content: '// Copy logger.js from onlyass.io or write your own.\n// See: https://onlyass.io/logger.js\n' });
+
+  // Root index
+  files.push({ path: `${ROOT}/index.html`, content: enterpriseRootIndex() });
+
+  // Per-layer files
+  LAYERS.forEach((layer, idx) => {
+    const allDirs = [...layer.subdirs, ...COMMON_DIRS];
+    const base = `${ROOT}/${layer.p}`;
+
+    // Layer README
+    let lReadme = `# L${idx} · p=${layer.p} — ${layer.fullName.toUpperCase()}\n\n`;
+    lReadme += `${layer.ring} · ${layer.q}\n\n`;
+    lReadme += `${layer.desc}\n\n`;
+    lReadme += `## ISA-95 mapping\n${layer.isa}\n\n## OSI mapping\n${layer.osi}\n\n`;
+    lReadme += `## Subdirectories\n\n`;
+    allDirs.forEach(d => { lReadme += `- \`${d.name}/\` — ${d.desc}\n`; });
+    lReadme += `\n## State machine\n\nAll state transitions in this layer use prime p=${layer.p}.\n`;
+    lReadme += `Error IDs: ${layer.p} × sequence (${layer.p}, ${layer.p*2}, ${layer.p*3}, ...)\n`;
+    lReadme += `Factor any ID to trace it back: if ID % ${layer.p} === 0, it came from here.\n`;
+    files.push({ path: `${base}/README.md`, content: lReadme });
+
+    // Layer index.html
+    files.push({ path: `${base}/index.html`, content: layerIndex(layer, idx) });
+
+    // Subdirectory READMEs + .gitkeep
+    allDirs.forEach(d => {
+      files.push({
+        path: `${base}/${d.name}/README.md`,
+        content: `# ${layer.p}/${d.name}\n\n${d.desc}\n\nLayer: L${idx} · p=${layer.p} · ${layer.fullName}\n\nThis directory is empty. Fill it.\n`
+      });
+      files.push({ path: `${base}/${d.name}/.gitkeep`, content: '' });
+    });
+
+    // State machine template
+    files.push({
+      path: `${base}/states/machine.json`,
+      content: JSON.stringify({
+        layer: `L${idx}`,
+        prime: layer.p,
+        name: layer.name,
+        states: ['init', 'ready', 'active', 'paused', 'error', 'shutdown'],
+        transitions: [
+          { from: null, to: 'init', desc: 'cold start' },
+          { from: 'init', to: 'ready', desc: 'initialization complete' },
+          { from: 'ready', to: 'active', desc: 'activated' },
+          { from: 'active', to: 'paused', desc: 'suspended' },
+          { from: 'paused', to: 'active', desc: 'resumed' },
+          { from: 'active', to: 'error', desc: 'fault detected' },
+          { from: 'error', to: 'init', desc: 'reset' },
+          { from: '*', to: 'shutdown', desc: 'shutdown requested' }
+        ],
+        error_id_formula: `${layer.p} × sequence_number`,
+        example_ids: [layer.p, layer.p*2, layer.p*3, layer.p*4, layer.p*5]
+      }, null, 2)
+    });
+
+    // Spec template
+    files.push({
+      path: `${base}/specs/contract.md`,
+      content: `# L${idx} Contract — p=${layer.p} · ${layer.fullName}\n\n` +
+        `## Inputs\n\n` +
+        (idx > 0 ? `Receives from: L${idx-1} (p=${LAYERS[idx-1].p} · ${LAYERS[idx-1].name})\n\n` : `Receives from: external (physical world)\n\n`) +
+        `## Outputs\n\n` +
+        (idx < 6 ? `Sends to: L${idx+1} (p=${LAYERS[idx+1].p} · ${LAYERS[idx+1].name})\n\n` : `Sends to: all layers (observability)\n\n`) +
+        `## Contract\n\nDefine the interface between layers here.\n` +
+        `\n## Error IDs\n\nAll errors from this layer: ${layer.p} × n\n` +
+        `Cross-layer errors with L${idx > 0 ? idx-1 : idx+1}: ${layer.p} × ${LAYERS[idx > 0 ? idx-1 : idx+1].p} × n = ${layer.p * LAYERS[idx > 0 ? idx-1 : idx+1].p} × n\n`
+    });
+
+    // Config template
+    files.push({
+      path: `${base}/config/layer.env.example`,
+      content: `# L${idx} · p=${layer.p} · ${layer.fullName}\n` +
+        `LAYER_PRIME=${layer.p}\n` +
+        `LAYER_RING=${layer.ring}\n` +
+        `LAYER_NAME=${layer.name}\n` +
+        `LAYER_COLOR=${layer.color}\n` +
+        `LOG_LEVEL=info\n` +
+        `STATE_MACHINE=states/machine.json\n`
+    });
+  });
+
+  // Cross-layer composite error reference
+  let compositeRef = `# Composite Error ID Reference\n\n`;
+  compositeRef += `When errors span multiple layers, the ID = product(primes) × sequence.\n\n`;
+  compositeRef += `## Common composites\n\n`;
+  compositeRef += `| Layers | Primes | Base ID | Meaning |\n|--------|--------|---------|---------|\n`;
+  compositeRef += `| L0+L1 | 2×3 | 6×n | field signal fault |\n`;
+  compositeRef += `| L1+L2 | 3×5 | 15×n | signal gate mismatch |\n`;
+  compositeRef += `| L2+L3 | 5×7 | 35×n | gate-core conflict |\n`;
+  compositeRef += `| L3+L4 | 7×11 | 77×n | core-decision disagreement |\n`;
+  compositeRef += `| L4+L5 | 11×13 | 143×n | decision-identity conflict |\n`;
+  compositeRef += `| L5+L6 | 13×17 | 221×n | identity-oversight tension |\n`;
+  compositeRef += `| L0-L6 | all | 510510×n | system-wide event (coherence/catastrophe) |\n`;
+  compositeRef += `\n## Factoring\n\nGiven any error ID, factor it to find the source layers:\n`;
+  compositeRef += `- ID=42 → 2×3×7 → L0 (ground) + L1 (signal) + L3 (heart)\n`;
+  compositeRef += `- ID=85 → 5×17 → L2 (gate) + L6 (watcher)\n`;
+  compositeRef += `- ID=510510 → all primes → full system event\n`;
+  files.push({ path: `${ROOT}/COMPOSITES.md`, content: compositeRef });
+
+  return files;
+}
+
+function enterpriseRootIndex() {
+  let pipes = '';
+  LAYERS.forEach((l, i) => {
+    pipes += `    <a class="pipe" href="${l.p}/" style="border-left-color:${l.color}">` +
+      `<span style="color:${l.color};font-weight:700;font-size:0.55rem;min-width:28px">L${i}</span>` +
+      `<span style="color:${l.color};font-weight:700;font-size:0.6rem;min-width:36px">p=${l.p}</span>` +
+      `<span style="color:${l.color};letter-spacing:3px;text-transform:uppercase;font-size:0.65rem">${l.fullName}</span>` +
+      `<span style="margin-left:auto;font-size:0.55rem;color:#333">${l.q}</span></a>\n`;
+  });
+  return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Enterprise Level A-Hole</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#888;font-family:monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+a{color:inherit;text-decoration:none}
+h1{font-size:1.8rem;color:#DCA030;margin-bottom:0.25rem}
+.ed{font-size:0.5rem;color:#FFD700;letter-spacing:6px;border:1px solid #FFD700;padding:2px 8px;margin-bottom:0.5rem;display:inline-block}
+p{font-size:0.7rem;color:#555;margin-bottom:2rem;letter-spacing:3px}
+.pipes{display:flex;flex-direction:column;gap:6px;width:100%;max-width:700px}
+.pipe{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#0f0f0f;border-left:3px solid;border-radius:4px;transition:all 0.3s}
+.pipe:hover{background:#151515;padding-left:24px}
+.fold{margin-top:2rem;font-size:0.6rem;color:#333;letter-spacing:4px}
+</style></head><body>
+<div class="ed">ENTERPRISE</div>
+<h1>YOUR A.S.S.</h1>
+<p>enterprise level a-hole · 7 layers</p>
+<div class="pipes">
+${pipes}</div>
+<div class="fold">2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510</div>
+<script src="logger.js"><\/script>
+</body></html>`;
+}
+
+function layerIndex(layer, idx) {
+  const allDirs = [...layer.subdirs, ...COMMON_DIRS];
+  let nav = LAYERS.map(l =>
+    `<a href="../${l.p}/"${l.p===layer.p?' style="color:'+l.color+'"':''}>${l.p}</a>`
+  ).join(' · ');
+  let dirList = allDirs.map(d =>
+    `<li><a href="${d.name}/">${d.name}/ <span class="hint">${d.desc}</span></a></li>`
+  ).join('\n    ');
+  return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>L${idx} · p=${layer.p} · ${layer.fullName.toUpperCase()}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#888;font-family:monospace;min-height:100vh;padding:2rem}
+header{text-align:center;padding:3rem 0 2rem;border-bottom:2px solid ${layer.color}}
+.layer-badge{font-size:0.5rem;letter-spacing:6px;color:#444;margin-bottom:0.5rem}
+h1{font-size:2rem;color:${layer.color}}
+.q{font-size:0.75rem;color:#555;margin-top:0.5rem;letter-spacing:2px}
+.mapping{font-size:0.55rem;color:#333;margin-top:0.5rem;letter-spacing:2px}
+nav{max-width:600px;margin:2rem auto}
+nav h2{font-size:0.65rem;letter-spacing:6px;color:#444;text-transform:uppercase;margin-bottom:1rem}
+nav ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+nav li a{display:block;padding:8px 16px;background:#0f0f0f;border-left:3px solid ${layer.color};border-radius:4px;font-size:0.7rem;letter-spacing:2px;color:${layer.color};text-decoration:none;transition:all 0.3s}
+nav li a:hover{background:#151515;padding-left:24px}
+nav li a .hint{display:block;font-size:0.55rem;color:#444;margin-top:2px;letter-spacing:1px}
+main{max-width:600px;margin:2rem auto;line-height:1.8;font-size:0.8rem;color:#555}
+main em{color:${layer.color};font-style:normal}
+footer{text-align:center;padding:2rem 0;margin-top:3rem;border-top:1px solid #1a1a1a;font-size:0.7rem;letter-spacing:2px}
+footer a{color:#555;text-decoration:none;margin:0 4px}
+</style></head><body>
+<header>
+  <div class="layer-badge">LAYER ${idx} · ENTERPRISE</div>
+  <h1>p=${layer.p} · ${layer.fullName.toUpperCase()}</h1>
+  <div class="q">${layer.q}</div>
+  <div class="mapping">${layer.isa} → ${layer.osi}</div>
+</header>
+<nav>
+  <h2>Subdirectories</h2>
+  <ul>
+    ${dirList}
+  </ul>
+</nav>
+<main>
+  <p>${layer.desc}</p>
+  <p>Error IDs from this layer: <em>${layer.p} × n</em> (${layer.p}, ${layer.p*2}, ${layer.p*3}, ${layer.p*4}, ...)</p>
+</main>
+<footer>
+  <a href="../">root</a> · ${nav}
+</footer>
+<script src="../logger.js"><\/script>
+</body></html>`;
+}
+
+// --- Minimal ZIP builder (same as basic hole) ---
+function createZipBlob(files) {
+  const enc = new TextEncoder();
+  const centralDir = [];
+  const localParts = [];
+  let offset = 0;
+  for (const file of files) {
+    const nameBytes = enc.encode(file.path);
+    const dataBytes = enc.encode(file.content);
+    const crc = crc32(dataBytes);
+    const local = new ArrayBuffer(30 + nameBytes.length + dataBytes.length);
+    const lv = new DataView(local);
+    lv.setUint32(0, 0x04034b50, true);
+    lv.setUint16(4, 20, true);
+    lv.setUint16(6, 0, true);
+    lv.setUint16(8, 0, true);
+    lv.setUint16(10, 0, true);
+    lv.setUint16(12, 0, true);
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, dataBytes.length, true);
+    lv.setUint32(22, dataBytes.length, true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
+    const localArr = new Uint8Array(local);
+    localArr.set(nameBytes, 30);
+    localArr.set(dataBytes, 30 + nameBytes.length);
+    localParts.push(localArr);
+    const central = new ArrayBuffer(46 + nameBytes.length);
+    const cv = new DataView(central);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, dataBytes.length, true);
+    cv.setUint32(24, dataBytes.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+    const centralArr = new Uint8Array(central);
+    centralArr.set(nameBytes, 46);
+    centralDir.push(centralArr);
+    offset += localArr.length;
+  }
+  const cdOffset = offset;
+  let cdSize = 0;
+  centralDir.forEach(c => cdSize += c.length);
+  const eocd = new ArrayBuffer(22);
+  const ev = new DataView(eocd);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, files.length, true);
+  ev.setUint16(10, files.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, cdOffset, true);
+  ev.setUint16(20, 0, true);
+  const parts = [...localParts, ...centralDir, new Uint8Array(eocd)];
+  const total = parts.reduce((s, p) => s + p.length, 0);
+  const result = new Uint8Array(total);
+  let pos = 0;
+  for (const part of parts) { result.set(part, pos); pos += part.length; }
+  return new Blob([result], { type: 'application/zip' });
+}
+
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data[i];
+    for (let j = 0; j < 8; j++) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+    }
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+</script>
+
+</body>
+</html>
