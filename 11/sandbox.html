@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>p=11 · THE VOICE SANDBOX — A.S.S. Enterprise LLM Builder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  /* A.S.S. pipe colors */
+  --p2:#B42838;--p3:#008CC8;--p5:#DCA030;--p7:#28B450;
+  --p11:#5078DC;--p13:#8C50C8;--p17:#787878;
+  --bg:#0a0a0a;--panel:#0f0f0f;--border:#1a1a1a;
+  --text:#888;--dim:#444;--gold:#DCA030;
+  --glow2:rgba(180,40,56,.12);--glow3:rgba(0,140,200,.12);
+  --glow5:rgba(220,160,48,.12);--glow7:rgba(40,180,80,.12);
+  --glow11:rgba(80,120,220,.12);--glow13:rgba(140,80,200,.12);
+  --glow17:rgba(120,120,120,.12);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Courier New',monospace;font-size:13px}
+::selection{background:var(--gold);color:#111}
+
+/* ─── Top Bar ─── */
+#topbar{height:38px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:12px;z-index:100}
+#topbar .logo{color:var(--gold);font-weight:bold;font-size:13px;letter-spacing:2px}
+#topbar .logo span{font-size:10px;color:var(--p11);margin-left:4px}
+#topbar .pipe-dots{display:flex;gap:3px;margin-left:8px}
+#topbar .pipe-dot{width:6px;height:6px;border-radius:50%;opacity:0.4;transition:opacity 0.3s}
+#topbar .pipe-dot.active{opacity:1;box-shadow:0 0 6px currentColor}
+#topbar .repo-name{color:var(--p7);font-size:12px}
+#topbar .branch{color:var(--gold);font-size:10px;background:#1a1a0a;padding:2px 8px;border-radius:3px;letter-spacing:1px}
+#topbar .status{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:1px}
+#topbar button{background:var(--panel);color:var(--text);border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:10px;font-family:inherit;letter-spacing:1px}
+#topbar button:hover{border-color:var(--gold);color:var(--gold)}
+#topbar .fold{font-size:9px;color:#333;letter-spacing:2px}
+
+/* ─── Grid: 7 panels = 7 pipes ─── */
+#grid{display:grid;grid-template-columns:200px 1fr 320px;grid-template-rows:1fr 1fr;height:calc(100vh - 38px);gap:1px;background:var(--border)}
+
+/* Panel headers — each pipe-colored */
+.ph{padding:6px 10px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;justify-content:space-between}
+.ph .prime{font-weight:700;font-size:9px;opacity:0.5;margin-right:6px}
+
+/* ─── p=2 GROUND: File Explorer ─── */
+#file-panel{grid-row:1/3;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;border-left:2px solid var(--p2)}
+#file-panel .ph{color:var(--p2)}
+#file-list{flex:1;overflow-y:auto;padding:4px 0}
+.file-entry{padding:5px 10px 5px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:11px;border-left:2px solid transparent;transition:all 0.2s}
+.file-entry:hover{background:var(--glow2)}
+.file-entry.active{background:var(--glow2);border-left-color:var(--p2)}
+.file-entry .icon{font-size:10px;width:14px;text-align:center}
+.file-entry .icon.html{color:var(--p2)}
+.file-entry .icon.css{color:var(--p3)}
+.file-entry .icon.js{color:var(--p5)}
+.file-entry .icon.other{color:var(--dim)}
+.file-entry .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-entry .size{color:var(--dim);font-size:9px}
+/* Commit Log */
+#commit-section{border-top:1px solid var(--border);max-height:160px;overflow-y:auto}
+#commit-section .ph{color:var(--p17);font-size:9px}
+.commit-entry{padding:4px 10px;font-size:10px;border-left:2px solid var(--border);margin-left:8px}
+.commit-entry .cid{color:var(--gold);font-size:9px}
+.commit-entry .cmsg{color:var(--dim)}
+
+/* ─── p=7 HEART: Preview ─── */
+#preview-area{grid-row:1/2;background:#080808;position:relative;overflow:hidden;border-top:2px solid var(--p7)}
+#preview-area .ph{position:absolute;top:0;left:0;right:0;height:28px;background:rgba(15,15,15,.95);border-bottom:1px solid var(--border);z-index:5;color:var(--p7)}
+#preview-tabs{display:flex;gap:2px;flex:1;overflow-x:auto;margin:0 8px}
+.preview-tab{padding:3px 8px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;font-size:10px;white-space:nowrap}
+.preview-tab:hover{color:var(--text)}
+.preview-tab.active{color:var(--p7);border-bottom-color:var(--p7)}
+#iframe-container{position:absolute;top:28px;left:0;right:0;bottom:0}
+#iframe-container iframe{width:100%;height:100%;border:none;background:#fff}
+#no-preview{position:absolute;top:28px;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:12px;flex-direction:column;gap:8px}
+#no-preview .hint{font-size:10px;color:#333}
+
+/* ─── p=17 WATCHER: Tool Viz ─── */
+#tool-viz{grid-row:2/2;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;border-bottom:2px solid var(--p17)}
+#tool-viz .ph{color:var(--p17)}
+#tool-log{flex:1;overflow-y:auto;padding:4px 0}
+.tool-entry{padding:5px 10px;border-bottom:1px solid rgba(26,26,26,.5);font-size:10px}
+.tool-entry .tool-name{color:var(--p13);font-weight:bold}
+.tool-entry .tool-pipe{font-size:8px;opacity:0.5;margin-left:4px}
+.tool-entry .tool-args{color:var(--dim);font-size:9px;margin-top:2px;word-break:break-all;max-height:36px;overflow:hidden}
+.tool-entry .tool-result{margin-top:2px;font-size:9px}
+.tool-entry .tool-result.ok{color:var(--p7)}
+.tool-entry .tool-result.err{color:var(--p2)}
+.tool-entry .tool-id{float:right;color:#333;font-size:8px;font-family:monospace}
+
+/* ─── p=11 VOICE: Chat ─── */
+#chat-panel{grid-row:1/3;background:var(--panel);display:flex;flex-direction:column;overflow:hidden;border-right:2px solid var(--p11)}
+#chat-panel .ph{color:var(--p11)}
+#emotion-bar{display:flex;gap:3px;margin-left:auto}
+.emo-dot{width:7px;height:7px;border-radius:50%;opacity:.2;transition:all 0.3s}
+.emo-dot.active{opacity:1;box-shadow:0 0 6px currentColor}
+#chat-messages{flex:1;overflow-y:auto;padding:8px}
+.msg{padding:6px 10px;margin-bottom:6px;border-radius:4px;font-size:11px;line-height:1.6;max-width:95%}
+.msg.user{background:var(--glow11);border:1px solid rgba(80,120,220,.2);margin-left:16px}
+.msg.ai{background:var(--glow7);border:1px solid rgba(40,180,80,.15)}
+.msg.system{background:var(--glow5);border:1px solid rgba(220,160,48,.15);font-size:10px;color:var(--dim)}
+.msg .sender{font-size:9px;color:var(--dim);margin-bottom:2px;letter-spacing:1px}
+.msg .emo-tag{font-size:8px;padding:1px 5px;border-radius:3px;margin-left:6px;background:rgba(255,255,255,.05)}
+.msg code{background:rgba(255,255,255,.06);padding:1px 4px;border-radius:2px;font-size:10px}
+.msg pre{background:rgba(0,0,0,.4);padding:6px;border-radius:4px;margin:4px 0;overflow-x:auto;font-size:10px;border-left:2px solid var(--p5)}
+.msg .tool-badge{display:inline-block;background:var(--glow13);color:var(--p13);padding:1px 6px;border-radius:3px;font-size:9px;margin:2px 0}
+
+/* Chat Input */
+#chat-input-area{border-top:1px solid var(--border);padding:8px}
+#chat-input-row{display:flex;gap:6px}
+#chat-input{flex:1;background:#080808;border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:4px;font-family:inherit;font-size:11px;resize:none;height:56px}
+#chat-input:focus{outline:none;border-color:var(--p11)}
+#chat-input::placeholder{color:#333}
+#chat-btns{display:flex;flex-direction:column;gap:4px}
+#chat-btns button{width:34px;height:26px;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:4px;cursor:pointer;font-size:11px}
+#chat-btns button:hover{border-color:var(--p11);color:var(--p11)}
+#chat-btns button.active{background:var(--p11);color:#000;border-color:var(--p11)}
+#voice-status{font-size:9px;color:var(--dim);margin-top:4px;height:12px;letter-spacing:1px}
+#mic-level-row{display:flex;align-items:center;gap:6px;margin-top:3px}
+#mic-level-bar{flex:1;height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden}
+#mic-level-fill{height:100%;width:0%;background:var(--p3);border-radius:2px;transition:width 50ms}
+#mic-level-label{font-size:8px;color:var(--dim);width:24px;text-align:right}
+#mic-indicator{width:6px;height:6px;border-radius:50%;background:#222;transition:background .15s}
+#mic-indicator.active{background:var(--p7);box-shadow:0 0 6px var(--p7)}
+
+/* ─── Load Overlay ─── */
+#load-overlay{position:fixed;inset:0;background:rgba(5,5,5,.98);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:14px}
+#load-overlay h1{color:var(--gold);font-size:20px;letter-spacing:4px}
+#load-overlay .pipes-display{display:flex;gap:4px;margin-bottom:4px}
+#load-overlay .pipes-display span{width:28px;height:4px;border-radius:2px;opacity:0.6}
+#load-overlay .sub{color:var(--dim);font-size:11px;letter-spacing:2px}
+#load-overlay .edition{font-size:9px;color:var(--gold);letter-spacing:6px;border:1px solid var(--gold);padding:2px 10px;border-radius:2px;margin-bottom:4px}
+#model-select{background:var(--panel);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:4px;font-family:inherit;font-size:12px;width:300px}
+#model-select:focus{outline:none;border-color:var(--gold)}
+#load-btn{background:var(--gold);color:#111;border:none;padding:10px 28px;border-radius:4px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;letter-spacing:2px}
+#load-btn:hover{background:#FFD700}
+#load-btn:disabled{opacity:.3;cursor:default}
+#load-progress{width:300px;height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden;display:none}
+#load-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--p2),var(--p3),var(--p5),var(--p7),var(--p11),var(--p13),var(--p17));transition:width .3s}
+#load-status{font-size:10px;color:var(--dim);height:14px;letter-spacing:1px}
+#gpu-status{font-size:10px;margin-bottom:4px;letter-spacing:1px}
+#gpu-status.ok{color:var(--p7)}
+#gpu-status.fail{color:var(--p2)}
+#skip-btn{background:transparent;color:var(--dim);border:1px solid var(--border);padding:6px 16px;border-radius:4px;font-family:inherit;cursor:pointer;margin-top:6px;font-size:10px;letter-spacing:1px}
+#skip-btn:hover{color:var(--text);border-color:var(--text)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#222;border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:#444}
+</style>
+</head>
+<body>
+
+<!-- Load Overlay -->
+<div id="load-overlay">
+  <div class="edition">A.S.S. ENTERPRISE</div>
+  <h1>VOICE SANDBOX</h1>
+  <div class="pipes-display">
+    <span style="background:var(--p2)"></span>
+    <span style="background:var(--p3)"></span>
+    <span style="background:var(--p5)"></span>
+    <span style="background:var(--p7)"></span>
+    <span style="background:var(--p11)"></span>
+    <span style="background:var(--p13)"></span>
+    <span style="background:var(--p17)"></span>
+  </div>
+  <div class="sub">p=11 · voice-powered LLM code builder</div>
+  <div id="gpu-status" class="ok">checking WebGPU...</div>
+  <select id="model-select">
+    <option value="SmolLM2-135M-Instruct-q4f16_1-MLC">SmolLM2-135M — 719MB (fastest)</option>
+    <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5-0.5B — 945MB</option>
+    <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC" selected>Llama-3.2-1B — 1.2GB (recommended)</option>
+    <option value="Gemma-2-2b-it-q4f16_1-MLC">Gemma-2-2B — 2.0GB</option>
+    <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5-1.5B — 1.6GB</option>
+    <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5-mini — 3.6GB</option>
+    <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama-3.2-3B — 2.9GB</option>
+  </select>
+  <div id="load-progress"><div id="load-bar"></div></div>
+  <div id="load-status"></div>
+  <button id="load-btn">LOAD MODEL & ENTER</button>
+  <button id="skip-btn">skip model — sandbox only</button>
+</div>
+
+<!-- Top Bar -->
+<div id="topbar">
+  <span class="logo">A.S.S. <span>p=11</span></span>
+  <div class="pipe-dots">
+    <div class="pipe-dot" style="background:var(--p2)" title="p=2 ground"></div>
+    <div class="pipe-dot" style="background:var(--p3)" title="p=3 signal"></div>
+    <div class="pipe-dot" style="background:var(--p5)" title="p=5 gate"></div>
+    <div class="pipe-dot" style="background:var(--p7)" title="p=7 heart"></div>
+    <div class="pipe-dot" style="background:var(--p11)" title="p=11 voice"></div>
+    <div class="pipe-dot" style="background:var(--p13)" title="p=13 mirror"></div>
+    <div class="pipe-dot" style="background:var(--p17)" title="p=17 watcher"></div>
+  </div>
+  <span class="repo-name" id="repo-name-display">untitled</span>
+  <span class="branch" id="branch-display">main</span>
+  <button id="btn-new-repo">New Repo</button>
+  <button id="btn-commit">Commit</button>
+  <span class="status" id="model-status">no model</span>
+  <span class="fold">510,510</span>
+</div>
+
+<!-- Main Grid: 7 pipes -->
+<div id="grid">
+
+  <!-- p=2 GROUND: File Explorer -->
+  <div id="file-panel">
+    <div class="ph"><span class="prime">p=2</span> GROUND: FILES <span id="file-count">0</span></div>
+    <div id="file-list"></div>
+    <div id="commit-section">
+      <div class="ph"><span class="prime">p=17</span> WATCHER: COMMITS</div>
+      <div id="commit-log"></div>
+    </div>
+  </div>
+
+  <!-- p=7 HEART: Preview -->
+  <div id="preview-area">
+    <div class="ph">
+      <span><span class="prime">p=7</span> HEART: PREVIEW</span>
+      <div id="preview-tabs"></div>
+      <button id="btn-refresh-preview" style="background:transparent;border:1px solid var(--border);color:var(--dim);padding:2px 6px;border-radius:3px;cursor:pointer;font-size:9px;margin-left:auto">↻</button>
+    </div>
+    <div id="iframe-container" style="display:none"></div>
+    <div id="no-preview">
+      <span style="color:var(--p7)">no preview yet</span>
+      <span class="hint">tell the AI to build something, or create .html manually</span>
+    </div>
+  </div>
+
+  <!-- p=17 WATCHER: Tool Viz -->
+  <div id="tool-viz">
+    <div class="ph"><span class="prime">p=17</span> WATCHER: TOOLS <span id="tool-count" style="font-size:9px;color:var(--dim)">0</span></div>
+    <div id="tool-log"></div>
+  </div>
+
+  <!-- p=11 VOICE: Chat -->
+  <div id="chat-panel">
+    <div class="ph">
+      <span><span class="prime">p=11</span> VOICE: CHAT</span>
+      <div id="emotion-bar">
+        <div class="emo-dot" style="color:var(--p5)" title="excitement"></div>
+        <div class="emo-dot" style="color:var(--p3)" title="calm"></div>
+        <div class="emo-dot" style="color:var(--p2)" title="anger"></div>
+        <div class="emo-dot" style="color:var(--p13)" title="sadness"></div>
+        <div class="emo-dot" style="color:var(--p7)" title="joy"></div>
+        <div class="emo-dot" style="color:var(--p11)" title="curiosity"></div>
+      </div>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <div id="chat-input-row">
+        <textarea id="chat-input" placeholder="speak or type — p=11 is listening..."></textarea>
+        <div id="chat-btns">
+          <button id="btn-send" title="Send">▶</button>
+          <button id="btn-mic" title="Voice (p=3)">🎤</button>
+        </div>
+      </div>
+      <div id="mic-level-row">
+        <div id="mic-indicator"></div>
+        <div id="mic-level-bar"><div id="mic-level-fill"></div></div>
+        <div id="mic-level-label">0%</div>
+      </div>
+      <div id="voice-status"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../logger.js"></script>
+<script type="module">
+import { createFile, editFile, readFile, deleteFile, listFiles, searchFiles,
+         commitChanges, getLog, getDiff, checkout, initRepo, getPreviewHTML,
+         getPreviewableFiles, executeTool, parseToolCalls, buildToolSystemPrompt,
+         getRepoState, getAllFiles, patchFile } from './modules/mcp-tools-engine.js';
+
+// ─── A.S.S. Pipe Loggers ───
+const P = {
+  ground:  ASSLogger.pipe(2),   // filesystem
+  signal:  ASSLogger.pipe(3),   // input/mic
+  gate:    ASSLogger.pipe(5),   // validation
+  heart:   ASSLogger.pipe(7),   // preview
+  voice:   ASSLogger.pipe(11),  // chat/LLM
+  mirror:  ASSLogger.pipe(13),  // model identity
+  watcher: ASSLogger.pipe(17)   // tool viz
+};
+
+// ─── State ───
+let engine = null, webllm = null, modelLoaded = false;
+let chatHistory = [], isGenerating = false;
+let currentPreview = null, selectedFile = null, toolCallCount = 0;
+let micActive = false, recognition = null;
+let audioCtx = null, analyser = null, micStream = null, dataArray = null, freqArray = null;
+const voice = { rms:0, f0:0, pDelta:0, sustain:0, coherence:0, vowel:'', pulseRate:0, energy:0 };
+const emotions = { excitement:0, calm:0.5, anger:0, sadness:0, joy:0, curiosity:0 };
+let dominantEmo = 'calm';
+
+// ─── DOM refs ───
+const $ = id => document.getElementById(id);
+const $overlay=$('load-overlay'), $loadBtn=$('load-btn'), $skipBtn=$('skip-btn');
+const $loadBar=$('load-bar'), $loadProg=$('load-progress'), $loadStatus=$('load-status');
+const $gpuStatus=$('gpu-status'), $modelSelect=$('model-select'), $modelStatus=$('model-status');
+const $repoName=$('repo-name-display'), $branchDisp=$('branch-display');
+const $fileList=$('file-list'), $fileCount=$('file-count'), $commitLog=$('commit-log');
+const $previewTabs=$('preview-tabs'), $iframeBox=$('iframe-container'), $noPreview=$('no-preview');
+const $toolLog=$('tool-log'), $toolCount=$('tool-count');
+const $chatMsgs=$('chat-messages'), $chatInput=$('chat-input');
+const $voiceStatus=$('voice-status'), $emoDots=document.querySelectorAll('.emo-dot');
+const $micFill=$('mic-level-fill'), $micLabel=$('mic-level-label'), $micIndicator=$('mic-indicator');
+const $pipeDots = document.querySelectorAll('.pipe-dot');
+
+// ─── Pipe dot activity pulser ───
+function pulsePipe(prime) {
+  const idx = [2,3,5,7,11,13,17].indexOf(prime);
+  if (idx < 0) return;
+  $pipeDots[idx].classList.add('active');
+  setTimeout(() => $pipeDots[idx].classList.remove('active'), 600);
+}
+
+// ─── Check WebGPU ───
+async function checkGPU() {
+  P.mirror.state(null, 'checking_gpu');
+  if (!navigator.gpu) {
+    $gpuStatus.textContent = 'WebGPU not available — model inference disabled';
+    $gpuStatus.className = 'fail';
+    $loadBtn.textContent = 'WEBGPU REQUIRED';
+    $loadBtn.disabled = true;
+    P.mirror.error('WebGPU unavailable');
+    return;
+  }
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    if (adapter) {
+      const info = await adapter.requestAdapterInfo?.() || {};
+      $gpuStatus.textContent = `WebGPU OK — ${info.vendor || 'GPU'} ${info.architecture || ''}`;
+      $gpuStatus.className = 'ok';
+      P.mirror.state('checking_gpu', 'gpu_ready', { vendor: info.vendor });
+    }
+  } catch(e) {
+    $gpuStatus.textContent = 'WebGPU detection failed';
+    $gpuStatus.className = 'fail';
+    P.mirror.error('WebGPU detection failed', { reason: e.message });
+  }
+}
+checkGPU();
+
+// ─── Load WebLLM (p=13 mirror — model identity) ───
+$loadBtn.onclick = async () => {
+  const modelId = $modelSelect.value;
+  $loadBtn.disabled = true;
+  $loadProg.style.display = 'block';
+  $loadStatus.textContent = 'importing WebLLM...';
+  P.mirror.state('gpu_ready', 'loading_model', { model: modelId });
+  pulsePipe(13);
+  try {
+    webllm = await import('https://esm.run/@mlc-ai/web-llm');
+    $loadStatus.textContent = `loading ${modelId}...`;
+    engine = await webllm.CreateMLCEngine(modelId, {
+      initProgressCallback: (report) => {
+        const pct = Math.round((report.progress || 0) * 100);
+        $loadBar.style.width = pct + '%';
+        $loadStatus.textContent = report.text || `loading... ${pct}%`;
+      }
+    });
+    modelLoaded = true;
+    $modelStatus.textContent = modelId.split('-').slice(0, 3).join('-');
+    $modelStatus.style.color = 'var(--p7)';
+    P.mirror.state('loading_model', 'model_ready', { model: modelId });
+    $overlay.style.display = 'none';
+    startSandbox();
+  } catch(e) {
+    $loadStatus.textContent = 'error: ' + e.message;
+    $loadBtn.disabled = false;
+    P.mirror.error('model load failed', { reason: e.message });
+  }
+};
+
+$skipBtn.onclick = () => {
+  $overlay.style.display = 'none';
+  $modelStatus.textContent = 'no model (sandbox only)';
+  P.mirror.state(null, 'skipped');
+  startSandbox();
+};
+
+// ─── Start Sandbox ───
+async function startSandbox() {
+  P.watcher.state(null, 'initializing');
+  initRepo('ass-project');
+  $repoName.textContent = 'ass-project';
+  refreshFileList();
+  refreshCommitLog();
+
+  addSystemMsg('A.S.S. sandbox online. ' + (modelLoaded
+    ? 'model loaded — speak or type to build.'
+    : 'no model — sandbox only. create files manually.'));
+
+  // Light up all pipe dots briefly
+  $pipeDots.forEach((d, i) => {
+    setTimeout(() => { d.classList.add('active'); setTimeout(() => d.classList.remove('active'), 800); }, i * 100);
+  });
+
+  P.watcher.state('initializing', 'ready');
+  await setupMic();
+  setupVoiceRecognition();
+  if (analyser && recognition) {
+    micActive = true;
+    $('btn-mic').classList.add('active');
+    try { recognition.start(); } catch(e) {}
+    $voiceStatus.textContent = 'listening — speak to chat...';
+  }
+}
+
+// ─── File Explorer (p=2 ground) ───
+function refreshFileList() {
+  const result = listFiles('/');
+  $fileList.innerHTML = '';
+  $fileCount.textContent = result.count;
+  pulsePipe(2);
+  for (const f of result.files) {
+    const div = document.createElement('div');
+    div.className = 'file-entry' + (f.path === selectedFile ? ' active' : '');
+    const iconClass = f.type === 'html' ? 'html' : f.type === 'css' ? 'css' : f.type === 'javascript' ? 'js' : 'other';
+    const icons = { html:'◇', css:'◆', javascript:'◈', text:'▫', json:'▪', markdown:'▫' };
+    div.innerHTML = `<span class="icon ${iconClass}">${icons[f.type]||'▫'}</span><span class="name">${f.path}</span><span class="size">${fmtSize(f.size)}</span>`;
+    div.onclick = () => selectFile(f.path);
+    $fileList.appendChild(div);
+  }
+  refreshPreviewTabs();
+}
+
+function selectFile(path) {
+  selectedFile = path;
+  P.ground.info('selected ' + path);
+  refreshFileList();
+  const file = readFile(path);
+  if (file.ok && file.type === 'html') showPreview(path);
+}
+
+function fmtSize(b) { return b < 1024 ? b + 'B' : (b/1024).toFixed(1) + 'K'; }
+
+// ─── Preview (p=7 heart) ───
+function refreshPreviewTabs() {
+  const { files } = getPreviewableFiles();
+  $previewTabs.innerHTML = '';
+  for (const f of files) {
+    const tab = document.createElement('div');
+    tab.className = 'preview-tab' + (f === currentPreview ? ' active' : '');
+    tab.textContent = f.split('/').pop();
+    tab.onclick = () => showPreview(f);
+    $previewTabs.appendChild(tab);
+  }
+}
+
+function showPreview(path) {
+  const result = getPreviewHTML(path);
+  if (!result.ok) { P.heart.error('preview failed', { path }); return; }
+  currentPreview = path;
+  P.heart.state(P.heart.getState(), 'rendering', { path });
+  pulsePipe(7);
+  $noPreview.style.display = 'none';
+  $iframeBox.style.display = 'block';
+  $iframeBox.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.sandbox = 'allow-scripts allow-same-origin';
+  $iframeBox.appendChild(iframe);
+  iframe.srcdoc = result.html;
+  refreshPreviewTabs();
+  refreshFileList();
+  P.heart.state('rendering', 'previewing', { path });
+}
+
+$('btn-refresh-preview').onclick = () => { if (currentPreview) showPreview(currentPreview); };
+
+// ─── Commit Log ───
+function refreshCommitLog() {
+  const { commits } = getLog(10);
+  $commitLog.innerHTML = '';
+  for (const c of commits) {
+    const div = document.createElement('div');
+    div.className = 'commit-entry';
+    div.innerHTML = `<span class="cid">${c.id}</span> <span class="cmsg">${escHtml(c.message)}</span>`;
+    $commitLog.appendChild(div);
+  }
+  const state = getRepoState();
+  $branchDisp.textContent = state.branch;
+}
+
+// ─── Tool Viz (p=17 watcher) ───
+function logToolCall(name, args, result) {
+  toolCallCount++;
+  $toolCount.textContent = toolCallCount;
+  pulsePipe(17);
+  // Determine which pipe this tool targets
+  const pipeMap = { create_file:2, edit_file:2, patch_file:2, delete_file:2, read_file:2, list_files:2, search:5, commit:17, preview:7 };
+  const prime = pipeMap[name] || 17;
+  const logEntry = P.watcher.info(`tool:${name}`, { args, ok: result.ok });
+
+  const div = document.createElement('div');
+  const argsStr = Object.entries(args||{}).map(([k,v]) => {
+    const val = typeof v === 'string' ? (v.length > 50 ? v.slice(0,50) + '…' : v) : JSON.stringify(v);
+    return `${k}=${val}`;
+  }).join(', ');
+  const resClass = result.ok ? 'ok' : 'err';
+  const resText = result.ok ? (result.path || result.summary || (result.count !== undefined ? result.count + ' items' : 'OK')) : result.error;
+  div.className = 'tool-entry';
+  div.innerHTML = `<span class="tool-id">id:${logEntry.id}</span><span class="tool-name">${name}</span><span class="tool-pipe" style="color:var(--p${prime})">p=${prime}</span><div class="tool-args">${escHtml(argsStr)}</div><div class="tool-result ${resClass}">${result.ok?'✓':'✗'} ${escHtml(String(resText))}</div>`;
+  $toolLog.prepend(div);
+  pulsePipe(prime);
+}
+
+// ─── Chat Formatting ───
+function formatLLM(text) {
+  let s = escHtml(text);
+  s = s.replace(/```\s*(create|edit|delete)\s+(\/[\w\-\.\/]+)\n([\s\S]*?)```/gi, (_,a,p) => `<span class="tool-badge">${a} ${p}</span>`);
+  s = s.replace(/```\s*commit\s+([\s\S]*?)```/gi, (_,m) => `<span class="tool-badge">commit: ${m.trim()}</span>`);
+  s = s.replace(/```\s*list\s*```/gi, '<span class="tool-badge">list files</span>');
+  s = s.replace(/&lt;tool_call&gt;([\s\S]*?)&lt;\/tool_call&gt;/g, '<span class="tool-badge">tool</span>');
+  s = s.replace(/&lt;path&gt;[\s\S]*?&lt;\/path&gt;/gi, '');
+  s = s.replace(/&lt;content&gt;[\s\S]*?&lt;\/content&gt;/gi, '');
+  s = s.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre>$2</pre>');
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+
+function addMsg(role, text, emoTag='') {
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const labels = { user:'YOU', ai:'A.S.S.', system:'SYSTEM' };
+  const emoHtml = emoTag ? `<span class="emo-tag">${emoTag}</span>` : '';
+  div.innerHTML = `<div class="sender">${labels[role]||role}${emoHtml}</div>${formatLLM(text)}`;
+  $chatMsgs.appendChild(div);
+  $chatMsgs.scrollTop = $chatMsgs.scrollHeight;
+  if (role === 'user') pulsePipe(11);
+  if (role === 'ai') pulsePipe(13);
+  return div;
+}
+
+function addSystemMsg(text) { addMsg('system', text); }
+function updateMsg(div, text) {
+  const sender = div.querySelector('.sender').outerHTML;
+  div.innerHTML = sender + formatLLM(text);
+  $chatMsgs.scrollTop = $chatMsgs.scrollHeight;
+}
+
+// ─── Send to LLM (p=11 voice + p=5 gate) ───
+async function sendMessage(text) {
+  if (!text.trim() || isGenerating) return;
+  isGenerating = true;
+  P.voice.info('user message', { len: text.length });
+  P.gate.state(null, 'filtering');
+
+  const emoProfile = { ...emotions };
+  const emoTag = dominantEmo + ' ' + (emoProfile[dominantEmo] * 100).toFixed(0) + '%';
+  addMsg('user', text, emoTag);
+  $chatInput.value = '';
+
+  if (!modelLoaded) {
+    addSystemMsg(`voice captured: "${text}" — load a model for AI responses.`);
+    P.gate.state('filtering', 'no_model');
+    isGenerating = false;
+    return;
+  }
+
+  P.gate.state('filtering', 'passed');
+
+  const state = getRepoState();
+  const repoCtx = state.fileCount > 0
+    ? `\nCURRENT REPO: ${state.fileCount} files (${state.files.join(', ')}), ${state.commitCount} commits on branch '${state.branch}'.`
+    : '';
+  const systemPrompt = buildToolSystemPrompt()
+    + `\n\nUSER EMOTION STATE: ${dominantEmo} (${(emoProfile[dominantEmo]*100).toFixed(0)}%). Emotions: ${Object.entries(emoProfile).map(([k,v])=>k+':'+Math.round(v*100)+'%').join(', ')}. Adapt tone accordingly.`
+    + `\n\nYou are running inside the A.S.S. (Autonomic Serenade System) pipe p=11 (voice). Your responses are logged with prime-factored IDs. Be efficient, be direct, build cool stuff.`
+    + repoCtx;
+
+  const messages = [{ role:'system', content: systemPrompt }];
+  messages.push(...chatHistory.slice(-16).filter(m => m.role==='user' || m.role==='assistant'));
+  messages.push({ role:'user', content: text });
+
+  const aiDiv = addMsg('ai', '…');
+  P.mirror.state(P.mirror.getState(), 'generating');
+  pulsePipe(13);
+
+  try {
+    let full = '';
+    const completion = await engine.chat.completions.create({ messages, stream:true, max_tokens:2048, temperature:0.7 });
+    for await (const chunk of completion) {
+      const delta = chunk.choices[0]?.delta?.content || '';
+      full += delta;
+      updateMsg(aiDiv, full + ' ▍');
+    }
+    updateMsg(aiDiv, full);
+    P.mirror.state('generating', 'complete');
+    P.voice.info('ai response', { len: full.length });
+
+    chatHistory.push({ role:'user', content: text });
+    chatHistory.push({ role:'assistant', content: full });
+    if (chatHistory.length > 32) chatHistory = chatHistory.slice(-32);
+
+    // Parse & execute tools (p=5 gate)
+    const toolCalls = parseToolCalls(full);
+    if (toolCalls.length > 0) {
+      P.gate.info('tool calls parsed', { count: toolCalls.length });
+      let toolResults = '';
+      for (const tc of toolCalls) {
+        const result = executeTool(tc.name, tc.args || {});
+        logToolCall(tc.name, tc.args || {}, result);
+        toolResults += `\nTool ${tc.name}: ${JSON.stringify(result)}\n`;
+        if (tc.name === 'preview' && result.ok) showPreview(tc.args.path);
+        else if ((tc.name === 'create_file' || tc.name === 'edit_file') && result.ok) {
+          const p = tc.args.path || '';
+          if (p.endsWith('.html') || p.endsWith('.htm')) showPreview(p);
+        }
+      }
+      refreshFileList();
+      refreshCommitLog();
+
+      // Follow-up from LLM
+      chatHistory.push({ role:'user', content: `[Tool Results]\n${toolResults}\n[Continue based on results. HTML files are now previewing.]` });
+      const followMsgs = [{ role:'system', content: systemPrompt }, ...chatHistory.slice(-20).filter(m=>m.role==='user'||m.role==='assistant')];
+      let followResp = '';
+      const followDiv = addMsg('ai', '…');
+      P.mirror.state('complete', 'follow_up');
+      const follow = await engine.chat.completions.create({ messages:followMsgs, stream:true, max_tokens:1024, temperature:0.7 });
+      for await (const chunk of follow) {
+        followResp += chunk.choices[0]?.delta?.content || '';
+        updateMsg(followDiv, followResp + ' ▍');
+      }
+      updateMsg(followDiv, followResp);
+      chatHistory.push({ role:'assistant', content: followResp });
+      P.mirror.state('follow_up', 'complete');
+
+      const moreCalls = parseToolCalls(followResp);
+      for (const tc of moreCalls) {
+        const result = executeTool(tc.name, tc.args || {});
+        logToolCall(tc.name, tc.args || {}, result);
+        if ((tc.name==='create_file'||tc.name==='edit_file'||tc.name==='preview') && result.ok) {
+          const p = tc.args?.path || '';
+          if (p.endsWith('.html') || p.endsWith('.htm') || tc.name==='preview') showPreview(p);
+        }
+      }
+      if (moreCalls.length > 0) { refreshFileList(); refreshCommitLog(); }
+    }
+  } catch(e) {
+    updateMsg(aiDiv, 'error: ' + e.message);
+    P.voice.error('generation failed', { reason: e.message });
+  }
+  isGenerating = false;
+}
+
+// ─── Chat Input ───
+$chatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage($chatInput.value); }
+});
+$('btn-send').onclick = () => sendMessage($chatInput.value);
+
+// ─── Manual Repo Buttons ───
+$('btn-new-repo').onclick = () => {
+  const name = prompt('repo name:', 'ass-project');
+  if (!name) return;
+  initRepo(name);
+  $repoName.textContent = name;
+  currentPreview = null;
+  $iframeBox.style.display = 'none';
+  $noPreview.style.display = 'flex';
+  P.ground.state(null, 'repo_init', { name });
+  refreshFileList();
+  refreshCommitLog();
+  addSystemMsg(`repo "${name}" initialized.`);
+};
+
+$('btn-commit').onclick = () => {
+  const msg = prompt('commit message:', 'update files');
+  if (!msg) return;
+  const result = commitChanges(msg);
+  logToolCall('commit', { message: msg }, result);
+  refreshCommitLog();
+  addSystemMsg(`committed: ${msg} (${result.id})`);
+};
+
+// ─── Microphone (p=3 signal) ───
+async function setupMic() {
+  try {
+    $voiceStatus.textContent = 'requesting mic...';
+    P.signal.state(null, 'requesting_mic');
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.8;
+    audioCtx.createMediaStreamSource(micStream).connect(analyser);
+    dataArray = new Float32Array(analyser.fftSize);
+    freqArray = new Uint8Array(analyser.frequencyBinCount);
+    P.signal.state('requesting_mic', 'mic_connected');
+    $voiceStatus.textContent = 'mic connected — click 🎤 for voice';
+    $micIndicator.classList.add('active');
+    requestAnimationFrame(analyzeLoop);
+  } catch(e) {
+    $voiceStatus.textContent = 'mic: ' + (e.name === 'NotAllowedError' ? 'denied' : e.message);
+    P.signal.error('mic setup failed', { reason: e.message });
+  }
+}
+
+// ─── Voice Analysis Loop ───
+let lastF0=0, smoothRms=0, onsetCount=0, lastOnset=0;
+function analyzeLoop() {
+  if (!analyser) return;
+  analyser.getFloatTimeDomainData(dataArray);
+  analyser.getByteFrequencyData(freqArray);
+  // RMS
+  let sum = 0;
+  for (let i = 0; i < dataArray.length; i++) sum += dataArray[i] * dataArray[i];
+  const rms = Math.sqrt(sum / dataArray.length);
+  smoothRms = smoothRms * 0.8 + rms * 0.2;
+  voice.rms = smoothRms;
+  voice.energy = Math.min(1, smoothRms * 8);
+  // F0 via autocorrelation
+  const sr = audioCtx.sampleRate;
+  let bestCorr=0, bestLag=0;
+  for (let lag = Math.floor(sr/500); lag < Math.floor(sr/60); lag++) {
+    let corr = 0;
+    for (let i = 0; i < dataArray.length - lag; i++) corr += dataArray[i] * dataArray[i+lag];
+    if (corr > bestCorr) { bestCorr = corr; bestLag = lag; }
+  }
+  const f0 = bestLag > 0 ? sr / bestLag : 0;
+  voice.pDelta = Math.abs(f0 - voice.f0);
+  voice.f0 = f0;
+  voice.sustain = f0 > 60 ? Math.min(1, voice.sustain + 0.02) : voice.sustain * 0.95;
+  voice.coherence = bestCorr > 0 ? Math.min(1, bestCorr / (dataArray.length * 0.01)) : 0;
+  // Onset detection
+  if (rms > 0.04 && Date.now() - lastOnset > 120) { onsetCount++; lastOnset = Date.now(); }
+  voice.pulseRate = Math.min(1, onsetCount / 30);
+  if (Date.now() % 2000 < 20) onsetCount = Math.max(0, onsetCount - 5);
+  // Formant vowel
+  let peakBin=0, peakVal=0;
+  const binHz = sr / analyser.fftSize;
+  for (let i = Math.floor(200/binHz); i < Math.floor(3000/binHz); i++) {
+    if (freqArray[i] > peakVal) { peakVal = freqArray[i]; peakBin = i; }
+  }
+  const formant = peakBin * binHz;
+  voice.vowel = formant<400?'oo':formant<700?'oh':formant<1200?'ah':formant<2000?'eh':'ee';
+  // Emotion
+  const pitch = Math.min(1, f0/400), vol = Math.min(1, smoothRms*6);
+  const pVar = Math.min(1, voice.pDelta/60), tempo = voice.pulseRate, steady = voice.coherence;
+  emotions.excitement = Math.min(1, pitch*0.4+vol*0.3+pVar*0.2+tempo*0.1);
+  emotions.calm = Math.min(1, (1-vol)*0.3+steady*0.3+(1-pVar)*0.2+(1-tempo)*0.2);
+  emotions.anger = Math.min(1, vol*0.4+(1-pitch)*0.1+pVar*0.2+tempo*0.3);
+  emotions.sadness = Math.min(1, (1-vol)*0.2+(1-pitch)*0.3+(1-tempo)*0.3+(1-pVar)*0.2);
+  emotions.joy = Math.min(1, pitch*0.3+vol*0.2+pVar*0.1+steady*0.2+tempo*0.2);
+  emotions.curiosity = Math.min(1, pVar*0.4+pitch*0.3+(1-vol)*0.1+steady*0.2);
+  let maxE = 0;
+  for (const [k,v] of Object.entries(emotions)) { if (v > maxE) { maxE = v; dominantEmo = k; } }
+  // Update UI
+  const micPct = Math.min(100, Math.round(voice.energy * 100));
+  $micFill.style.width = micPct + '%';
+  const pipeColor = micPct > 70 ? 'var(--p5)' : micPct > 40 ? 'var(--p7)' : 'var(--p3)';
+  $micFill.style.background = pipeColor;
+  $micLabel.textContent = micPct + '%';
+  $micIndicator.classList.toggle('active', micPct > 5);
+  if (micPct > 30) pulsePipe(3); // signal pipe lights up when mic active
+  const emoKeys = ['excitement','calm','anger','sadness','joy','curiosity'];
+  $emoDots.forEach((dot,i) => {
+    dot.classList.toggle('active', emotions[emoKeys[i]] > 0.4);
+    dot.style.opacity = 0.2 + emotions[emoKeys[i]] * 0.8;
+  });
+  requestAnimationFrame(analyzeLoop);
+}
+
+// ─── Voice Recognition (p=3 signal → p=11 voice) ───
+function setupVoiceRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { $voiceStatus.textContent = 'speech recognition unavailable'; return; }
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.onresult = (e) => {
+    let final='', interim='';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (interim) {
+      $voiceStatus.textContent = '🎤 ' + interim;
+      $chatInput.value = interim;
+      $chatInput.style.borderColor = 'var(--p3)';
+    }
+    if (final.trim()) {
+      $voiceStatus.textContent = 'listening...';
+      $chatInput.value = '';
+      $chatInput.style.borderColor = '';
+      P.signal.info('voice final', { text: final.trim().slice(0, 50) });
+      sendMessage(final.trim());
+    }
+  };
+  recognition.onerror = (e) => {
+    if (e.error === 'no-speech' || e.error === 'aborted') {
+      if (micActive) $voiceStatus.textContent = 'listening...';
+      return;
+    }
+    micActive = false;
+    $('btn-mic').classList.remove('active');
+    $voiceStatus.textContent = 'voice error: ' + e.error;
+    P.signal.error('speech recognition error', { error: e.error });
+  };
+  recognition.onend = () => {
+    if (micActive) setTimeout(() => { try { recognition.start(); } catch(e) {} }, 150);
+  };
+}
+
+$('btn-mic').onclick = async () => {
+  if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+  if (!analyser) await setupMic();
+  if (!recognition) { $voiceStatus.textContent = 'speech recognition not supported'; return; }
+  micActive = !micActive;
+  $('btn-mic').classList.toggle('active', micActive);
+  if (micActive) {
+    try { recognition.start(); } catch(e) {}
+    $voiceStatus.textContent = 'listening...';
+    P.signal.state(P.signal.getState(), 'listening');
+  } else {
+    recognition.stop();
+    $voiceStatus.textContent = 'mic paused';
+    P.signal.state('listening', 'paused');
+  }
+};
+
+// ─── Utilities ───
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Log startup coherence
+ASSLogger.composite([2,3,5,7,11,13,17], 'sandbox boot — all pipes initialized');
+</script>
+</body>
+</html>
