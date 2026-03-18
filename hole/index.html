@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE EMPTY ASS — OnlyASS.io</title>
+<meta name="description" content="Download the empty A.S.S. topology. Seven pipes. Seven primes. One fold. Your infrastructure starts here.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:'Space Mono',monospace;min-height:100vh;padding:2rem}
+::selection{background:#DCA030;color:#111}
+a{color:#DCA030;text-decoration:none;transition:opacity 0.3s}
+a:hover{opacity:0.7}
+
+header{text-align:center;padding:3rem 0 2rem;border-bottom:2px solid #DCA030}
+header h1{font-family:'Creepster',cursive;font-size:clamp(2rem,6vw,3.5rem);color:#DCA030;text-shadow:0 0 30px rgba(220,160,48,0.2)}
+header .hole-icon{font-size:4rem;margin-bottom:1rem;display:block;opacity:0.4}
+header p{font-family:'Inter',sans-serif;font-weight:300;font-size:0.85rem;color:#555;margin-top:0.5rem;letter-spacing:2px}
+
+.intro{max-width:600px;margin:2rem auto;font-family:'Inter',sans-serif;font-weight:300;line-height:1.8;font-size:0.85rem;color:#555;text-align:center}
+.intro em{color:#DCA030;font-style:normal}
+
+/* Tree view */
+.tree-section{max-width:650px;margin:2rem auto}
+.tree-section h2{font-size:0.7rem;letter-spacing:6px;color:#444;text-transform:uppercase;margin-bottom:1rem}
+.tree{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:1.5rem 2rem;font-size:0.7rem;line-height:2;color:#555;overflow-x:auto;white-space:pre}
+.tree .dir{color:#DCA030}
+.tree .file{color:#666}
+.tree .prime{color:#B42838;font-weight:700}
+.tree .meta{color:#444;font-style:italic}
+
+/* Download section */
+.download{max-width:600px;margin:3rem auto;text-align:center}
+.dl-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0}
+.dl-btn{padding:12px 24px;border:2px solid #DCA030;background:transparent;color:#DCA030;font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:3px;cursor:pointer;border-radius:4px;transition:all 0.3s;text-transform:uppercase}
+.dl-btn:hover{background:#DCA030;color:#111}
+.dl-btn.alt{border-color:#555;color:#555}
+.dl-btn.alt:hover{background:#555;color:#111}
+
+/* Shell script view */
+.shell{display:none;max-width:650px;margin:1.5rem auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:1.5rem;font-size:0.65rem;line-height:1.8;color:#28B450;overflow-x:auto;white-space:pre;position:relative}
+.shell.active{display:block}
+.shell .comment{color:#444}
+.copy-hint{position:absolute;top:8px;right:12px;font-size:0.55rem;color:#333;letter-spacing:2px}
+
+/* Pipe manifest preview */
+.manifest{max-width:650px;margin:2rem auto}
+.manifest h2{font-size:0.7rem;letter-spacing:6px;color:#444;text-transform:uppercase;margin-bottom:1rem}
+.pipe-row{display:flex;align-items:center;gap:12px;padding:8px 16px;background:#0f0f0f;border-left:3px solid;border-radius:4px;margin-bottom:6px;font-size:0.7rem}
+.pipe-row .p-num{font-weight:700;min-width:36px;opacity:0.5}
+.pipe-row .p-name{letter-spacing:3px;text-transform:uppercase}
+.pipe-row .p-ring{font-family:'Inter',sans-serif;font-weight:300;font-size:0.6rem;color:#444;margin-left:auto}
+.pipe-row .p-q{font-family:'Inter',sans-serif;font-weight:300;font-size:0.55rem;color:#333;margin-left:8px;display:none}
+.pipe-row:hover .p-q{display:inline}
+
+/* footer */
+footer{text-align:center;padding:3rem 0 2rem;border-top:1px solid #1a1a1a;margin-top:3rem}
+footer .ring-nav{font-size:0.75rem;letter-spacing:2px;margin-bottom:1rem}
+footer .ring-nav a{margin:0 4px}
+footer .fold{font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="hole-icon">🕳️</span>
+  <h1>THE EMPTY ASS</h1>
+  <p>download the topology · fill it yourself</p>
+</header>
+
+<div class="intro">
+  <p>
+    This is the <em>hole</em>. An empty A.S.S. scaffold with the full
+    seven-pipe topology, manifest, logger, and index pages — all wired up,
+    all empty, ready to fill with whatever infrastructure <em>you</em> want
+    to build underground.
+  </p>
+  <p style="margin-top:1rem">
+    Seven directories. Seven primes. One fold.<br>
+    <em>2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510</em>
+  </p>
+</div>
+
+<div class="tree-section">
+  <h2>What's in the hole</h2>
+  <div class="tree"><span class="dir">your-ass/</span>
+├── <span class="file">index.html</span>           <span class="meta">← manhole cover + underground view</span>
+├── <span class="file">510510.json</span>          <span class="meta">← the manifest (your fold)</span>
+├── <span class="file">logger.js</span>            <span class="meta">← prime-factored error/state logger</span>
+├── <span class="file">README.md</span>            <span class="meta">← what is this</span>
+├── <span class="dir"><span class="prime">2</span>/</span>                     <span class="meta">← R0 · ground</span>
+│   ├── <span class="file">index.html</span>       <span class="meta">← ring page</span>
+│   └── <span class="file">README.md</span>        <span class="meta">← what goes here</span>
+├── <span class="dir"><span class="prime">3</span>/</span>                     <span class="meta">← R1 · signal</span>
+│   ├── <span class="file">index.html</span>
+│   └── <span class="file">README.md</span>
+├── <span class="dir"><span class="prime">5</span>/</span>                     <span class="meta">← R2 · gate</span>
+│   ├── <span class="file">index.html</span>
+│   └── <span class="file">README.md</span>
+├── <span class="dir"><span class="prime">7</span>/</span>                     <span class="meta">← R3 · heart</span>
+│   ├── <span class="file">index.html</span>
+│   └── <span class="file">README.md</span>
+├── <span class="dir"><span class="prime">11</span>/</span>                    <span class="meta">← R4 · voice</span>
+│   ├── <span class="file">index.html</span>
+│   └── <span class="file">README.md</span>
+├── <span class="dir"><span class="prime">13</span>/</span>                    <span class="meta">← R5 · mirror</span>
+│   ├── <span class="file">index.html</span>
+│   └── <span class="file">README.md</span>
+├── <span class="dir"><span class="prime">17</span>/</span>                    <span class="meta">← R6 · watcher</span>
+│   ├── <span class="file">index.html</span>
+│   └── <span class="file">README.md</span>
+└── <span class="dir">∞/</span>                     <span class="meta">← R7 · network</span>
+    ├── <span class="file">index.html</span>
+    └── <span class="file">README.md</span></div>
+</div>
+
+<div class="manifest">
+  <h2>The seven pipes</h2>
+  <div class="pipe-row" style="border-color:#B42838"><span class="p-num" style="color:#B42838">p=2</span><span class="p-name" style="color:#B42838">ground</span><span class="p-ring">R0</span><span class="p-q">what are you standing on?</span></div>
+  <div class="pipe-row" style="border-color:#008CC8"><span class="p-num" style="color:#008CC8">p=3</span><span class="p-name" style="color:#008CC8">signal</span><span class="p-ring">R1</span><span class="p-q">what comes in?</span></div>
+  <div class="pipe-row" style="border-color:#DCA030"><span class="p-num" style="color:#DCA030">p=5</span><span class="p-name" style="color:#DCA030">gate</span><span class="p-ring">R2</span><span class="p-q">what gets through?</span></div>
+  <div class="pipe-row" style="border-color:#28B450"><span class="p-num" style="color:#28B450">p=7</span><span class="p-name" style="color:#28B450">heart</span><span class="p-ring">R3</span><span class="p-q">what do you feel?</span></div>
+  <div class="pipe-row" style="border-color:#5078DC"><span class="p-num" style="color:#5078DC">p=11</span><span class="p-name" style="color:#5078DC">voice</span><span class="p-ring">R4</span><span class="p-q">what do you decide?</span></div>
+  <div class="pipe-row" style="border-color:#8C50C8"><span class="p-num" style="color:#8C50C8">p=13</span><span class="p-name" style="color:#8C50C8">mirror</span><span class="p-ring">R5</span><span class="p-q">who are you?</span></div>
+  <div class="pipe-row" style="border-color:#787878"><span class="p-num" style="color:#787878">p=17</span><span class="p-name" style="color:#787878">watcher</span><span class="p-ring">R6</span><span class="p-q">who sees it all?</span></div>
+</div>
+
+<div class="download">
+  <h2 style="font-size:0.7rem;letter-spacing:6px;color:#444;text-transform:uppercase;margin-bottom:0.5rem">Dig your hole</h2>
+  <p style="font-family:'Inter',sans-serif;font-weight:300;font-size:0.75rem;color:#555;margin-bottom:1rem">Choose your method. Same hole either way.</p>
+  <div class="dl-buttons">
+    <button class="dl-btn" onclick="downloadZip()">DOWNLOAD .ZIP</button>
+    <button class="dl-btn alt" onclick="toggleShell()">SHOW SHELL SCRIPT</button>
+  </div>
+</div>
+
+<div class="shell" id="shell"><span class="copy-hint">[ click to copy ]</span><span class="comment">#!/bin/bash
+# The Empty Ass — A.S.S. scaffold generator
+# 2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510</span>
+
+NAME="${1:-my-ass}"
+mkdir -p "$NAME"/{2,3,5,7,11,13,17,∞}
+
+<span class="comment"># Manifest</span>
+cat > "$NAME/510510.json" &lt;&lt; 'FOLD'
+{
+  "name": "your-ass",
+  "what": "Your A.S.S.",
+  "fold": 510510,
+  "primes": [2, 3, 5, 7, 11, 13, 17],
+  "directories": {
+    "2":  {"ring": "R0", "name": "ground",  "color": "#B42838", "question": "what are you standing on?"},
+    "3":  {"ring": "R1", "name": "signal",  "color": "#008CC8", "question": "what comes in?"},
+    "5":  {"ring": "R2", "name": "gate",    "color": "#DCA030", "question": "what gets through?"},
+    "7":  {"ring": "R3", "name": "heart",   "color": "#28B450", "question": "what do you feel?"},
+    "11": {"ring": "R4", "name": "voice",   "color": "#5078DC", "question": "what do you decide?"},
+    "13": {"ring": "R5", "name": "mirror",  "color": "#8C50C8", "question": "who are you?"},
+    "17": {"ring": "R6", "name": "watcher", "color": "#787878", "question": "who sees it all?"},
+    "∞":  {"ring": "R7", "name": "network", "color": "#DCA030", "question": "how do you connect?"}
+  },
+  "license": "MIT",
+  "cowbell": true
+}
+FOLD
+
+<span class="comment"># README</span>
+cat > "$NAME/README.md" &lt;&lt; 'EOF'
+# Your A.S.S.
+
+Seven pipes. Seven primes. One fold.
+
+| Dir | Prime | Ring | Name | Question |
+|-----|-------|------|------|----------|
+| /2/ | p=2 | R0 | ground | what are you standing on? |
+| /3/ | p=3 | R1 | signal | what comes in? |
+| /5/ | p=5 | R2 | gate | what gets through? |
+| /7/ | p=7 | R3 | heart | what do you feel? |
+| /11/ | p=11 | R4 | voice | what do you decide? |
+| /13/ | p=13 | R5 | mirror | who are you? |
+| /17/ | p=17 | R6 | watcher | who sees it all? |
+| /∞/ | ∞ | R7 | network | how do you connect? |
+
+2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510
+
+Fill the pipes. MIT license.
+EOF
+
+<span class="comment"># Pipe READMEs</span>
+declare -A RINGS=(
+  [2]="R0|ground|what are you standing on?"
+  [3]="R1|signal|what comes in?"
+  [5]="R2|gate|what gets through?"
+  [7]="R3|heart|what do you feel?"
+  [11]="R4|voice|what do you decide?"
+  [13]="R5|mirror|who are you?"
+  [17]="R6|watcher|who sees it all?"
+  [∞]="R7|network|how do you connect?"
+)
+
+for p in 2 3 5 7 11 13 17 ∞; do
+  IFS='|' read -r ring name question &lt;&lt;&lt; "${RINGS[$p]}"
+  cat > "$NAME/$p/README.md" &lt;&lt; PIPE
+# p=$p — ${name^^}
+
+$ring · $question
+
+This pipe is empty. Fill it.
+PIPE
+done
+
+echo "dug: $NAME/ ($(find "$NAME" -type f | wc -l) files)"
+echo "fold = 510,510"</div>
+
+<footer>
+  <div class="ring-nav">
+    <a href="../">manhole</a> ·
+    <a href="../2/">2</a> ·
+    <a href="../3/">3</a> ·
+    <a href="../5/">5</a> ·
+    <a href="../7/">7</a> ·
+    <a href="../11/">11</a> ·
+    <a href="../13/">13</a> ·
+    <a href="../17/">17</a> ·
+    <a href="../∞/">∞</a>
+  </div>
+  <div class="fold">fold = 510,510</div>
+</footer>
+
+<script src="../logger.js"></script>
+<script>
+const holeLog = ASSLogger.pipe(2); // ground — this is where you start digging
+
+// --- ZIP generation (no dependencies, pure browser) ---
+// Minimal zip builder — no JSZip needed, just raw deflate-store
+function downloadZip() {
+  holeLog.info('zip download initiated');
+  try {
+    const files = buildTemplateFiles();
+    const blob = createZipBlob(files);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'the-empty-ass.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+    holeLog.info('zip downloaded', { fileCount: files.length });
+  } catch (e) {
+    holeLog.error('zip generation failed', { reason: e.message });
+  }
+}
+
+function buildTemplateFiles() {
+  const PIPES = [
+    { p: '2',  ring: 'R0', name: 'ground',  color: '#B42838', q: 'what are you standing on?' },
+    { p: '3',  ring: 'R1', name: 'signal',  color: '#008CC8', q: 'what comes in?' },
+    { p: '5',  ring: 'R2', name: 'gate',    color: '#DCA030', q: 'what gets through?' },
+    { p: '7',  ring: 'R3', name: 'heart',   color: '#28B450', q: 'what do you feel?' },
+    { p: '11', ring: 'R4', name: 'voice',   color: '#5078DC', q: 'what do you decide?' },
+    { p: '13', ring: 'R5', name: 'mirror',  color: '#8C50C8', q: 'who are you?' },
+    { p: '17', ring: 'R6', name: 'watcher', color: '#787878', q: 'who sees it all?' },
+    { p: '∞',  ring: 'R7', name: 'network', color: '#DCA030', q: 'how do you connect?' }
+  ];
+
+  const files = [];
+
+  // 510510.json
+  const manifest = {
+    name: 'your-ass',
+    what: 'Your A.S.S.',
+    fold: 510510,
+    primes: [2, 3, 5, 7, 11, 13, 17],
+    directories: {},
+    license: 'MIT',
+    cowbell: true
+  };
+  PIPES.forEach(p => {
+    manifest.directories[p.p] = { ring: p.ring, name: p.name, color: p.color, question: p.q };
+  });
+  files.push({ path: 'your-ass/510510.json', content: JSON.stringify(manifest, null, 2) });
+
+  // Root README
+  let readme = '# Your A.S.S.\n\nSeven pipes. Seven primes. One fold.\n\n';
+  readme += '| Dir | Prime | Ring | Name | Question |\n|-----|-------|------|------|----------|\n';
+  PIPES.forEach(p => { readme += `| /${p.p}/ | p=${p.p} | ${p.ring} | ${p.name} | ${p.q} |\n`; });
+  readme += '\n2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510\n\nFill the pipes. MIT license.\n';
+  files.push({ path: 'your-ass/README.md', content: readme });
+
+  // Logger
+  files.push({ path: 'your-ass/logger.js', content: '// Copy logger.js from onlyass.io or write your own.\n// See: https://onlyass.io/logger.js\n' });
+
+  // Root index placeholder
+  files.push({ path: 'your-ass/index.html', content: rootIndexTemplate(PIPES) });
+
+  // Per-pipe files
+  PIPES.forEach(pipe => {
+    files.push({
+      path: `your-ass/${pipe.p}/README.md`,
+      content: `# p=${pipe.p} — ${pipe.name.toUpperCase()}\n\n${pipe.ring} · ${pipe.q}\n\nThis pipe is empty. Fill it.\n`
+    });
+    files.push({
+      path: `your-ass/${pipe.p}/index.html`,
+      content: pipeIndexTemplate(pipe, PIPES)
+    });
+  });
+
+  return files;
+}
+
+function rootIndexTemplate(pipes) {
+  let pipeHtml = '';
+  pipes.forEach(p => {
+    pipeHtml += `    <a class="pipe" href="${p.p}/" data-prime="${p.p}" style="border-left-color:${p.color}">` +
+      `<span style="color:${p.color};font-weight:700;font-size:0.65rem;min-width:36px">p=${p.p}</span>` +
+      `<span style="color:${p.color};letter-spacing:3px;text-transform:uppercase;font-size:0.7rem">${p.name}</span>` +
+      `<span style="margin-left:auto;font-size:0.6rem;color:#444">${p.q}</span></a>\n`;
+  });
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your A.S.S.</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+a{color:inherit;text-decoration:none}
+h1{font-size:2rem;color:#DCA030;margin-bottom:0.5rem}
+p{font-size:0.75rem;color:#555;margin-bottom:2rem;letter-spacing:4px}
+.pipes{display:flex;flex-direction:column;gap:8px;width:100%;max-width:600px}
+.pipe{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#0f0f0f;border-left:3px solid;border-radius:4px;transition:all 0.3s}
+.pipe:hover{background:#151515;padding-left:24px}
+.fold{margin-top:2rem;font-size:0.6rem;color:#333;letter-spacing:4px}
+</style>
+</head>
+<body>
+<h1>YOUR A.S.S.</h1>
+<p>the infrastructure nobody talks about</p>
+<div class="pipes">
+${pipeHtml}</div>
+<div class="fold">2 × 3 × 5 × 7 × 11 × 13 × 17 = 510,510</div>
+<script src="logger.js"><\/script>
+</body>
+</html>`;
+}
+
+function pipeIndexTemplate(pipe, allPipes) {
+  const nav = allPipes.map(p =>
+    `<a href="../${p.p}/"${p.p === pipe.p ? ' style="color:' + p.color + '"' : ''}>${p.p}</a>`
+  ).join(' · ');
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>p=${pipe.p} · ${pipe.name.toUpperCase()}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#888;font-family:monospace;min-height:100vh;padding:2rem}
+header{text-align:center;padding:3rem 0 2rem;border-bottom:2px solid ${pipe.color}}
+h1{font-size:2rem;color:${pipe.color}}
+p{font-size:0.75rem;color:#555;margin-top:0.5rem;letter-spacing:2px}
+main{max-width:600px;margin:2rem auto;line-height:1.8;font-size:0.85rem;color:#555}
+main em{color:${pipe.color};font-style:normal}
+footer{text-align:center;padding:2rem 0;margin-top:3rem;border-top:1px solid #1a1a1a;font-size:0.7rem;letter-spacing:2px}
+footer a{color:#555;text-decoration:none;margin:0 4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>p=${pipe.p} · ${pipe.name.toUpperCase()}</h1>
+  <p>${pipe.q}</p>
+</header>
+<main>
+  <p>This pipe is <em>empty</em>. Whatever belongs in ${pipe.ring} — put it here.</p>
+</main>
+<footer>
+  <a href="../">manhole</a> · ${nav}
+</footer>
+<script src="../logger.js"><\/script>
+</body>
+</html>`;
+}
+
+// --- Minimal ZIP builder (store-only, no compression, no dependencies) ---
+function createZipBlob(files) {
+  const enc = new TextEncoder();
+  const centralDir = [];
+  const localParts = [];
+  let offset = 0;
+
+  for (const file of files) {
+    const nameBytes = enc.encode(file.path);
+    const dataBytes = enc.encode(file.content);
+    const crc = crc32(dataBytes);
+
+    // Local file header
+    const local = new ArrayBuffer(30 + nameBytes.length + dataBytes.length);
+    const lv = new DataView(local);
+    lv.setUint32(0, 0x04034b50, true);  // sig
+    lv.setUint16(4, 20, true);          // version needed
+    lv.setUint16(6, 0, true);           // flags
+    lv.setUint16(8, 0, true);           // compression (store)
+    lv.setUint16(10, 0, true);          // mod time
+    lv.setUint16(12, 0, true);          // mod date
+    lv.setUint32(14, crc, true);        // crc32
+    lv.setUint32(18, dataBytes.length, true); // compressed
+    lv.setUint32(22, dataBytes.length, true); // uncompressed
+    lv.setUint16(26, nameBytes.length, true); // name len
+    lv.setUint16(28, 0, true);          // extra len
+
+    const localArr = new Uint8Array(local);
+    localArr.set(nameBytes, 30);
+    localArr.set(dataBytes, 30 + nameBytes.length);
+    localParts.push(localArr);
+
+    // Central directory entry
+    const central = new ArrayBuffer(46 + nameBytes.length);
+    const cv = new DataView(central);
+    cv.setUint32(0, 0x02014b50, true);  // sig
+    cv.setUint16(4, 20, true);          // version made by
+    cv.setUint16(6, 20, true);          // version needed
+    cv.setUint16(8, 0, true);           // flags
+    cv.setUint16(10, 0, true);          // compression
+    cv.setUint16(12, 0, true);          // mod time
+    cv.setUint16(14, 0, true);          // mod date
+    cv.setUint32(16, crc, true);        // crc32
+    cv.setUint32(20, dataBytes.length, true);
+    cv.setUint32(24, dataBytes.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);          // extra len
+    cv.setUint16(32, 0, true);          // comment len
+    cv.setUint16(34, 0, true);          // disk number
+    cv.setUint16(36, 0, true);          // internal attrs
+    cv.setUint32(38, 0, true);          // external attrs
+    cv.setUint32(42, offset, true);     // local header offset
+    const centralArr = new Uint8Array(central);
+    centralArr.set(nameBytes, 46);
+    centralDir.push(centralArr);
+
+    offset += localArr.length;
+  }
+
+  const cdOffset = offset;
+  let cdSize = 0;
+  centralDir.forEach(c => cdSize += c.length);
+
+  // End of central directory
+  const eocd = new ArrayBuffer(22);
+  const ev = new DataView(eocd);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, files.length, true);
+  ev.setUint16(10, files.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, cdOffset, true);
+  ev.setUint16(20, 0, true);
+
+  const parts = [...localParts, ...centralDir, new Uint8Array(eocd)];
+  const total = parts.reduce((s, p) => s + p.length, 0);
+  const result = new Uint8Array(total);
+  let pos = 0;
+  for (const part of parts) { result.set(part, pos); pos += part.length; }
+  return new Blob([result], { type: 'application/zip' });
+}
+
+// CRC-32 (standard polynomial)
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data[i];
+    for (let j = 0; j < 8; j++) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+    }
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+// Shell script toggle
+function toggleShell() {
+  const el = document.getElementById('shell');
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    holeLog.info('shell script viewed');
+  }
+}
+
+// Click-to-copy on shell script
+document.getElementById('shell').addEventListener('click', function() {
+  // Extract text content, stripping HTML tags
+  const text = this.innerText.replace('[ click to copy ]', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const hint = this.querySelector('.copy-hint');
+    hint.textContent = '[ copied! ]';
+    holeLog.info('shell script copied');
+    setTimeout(() => { hint.textContent = '[ click to copy ]'; }, 2000);
+  }).catch(() => {});
+});
+</script>
+
+</body>
+</html>
