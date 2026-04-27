@@ -396,6 +396,21 @@ setInterval(()=>{
 
 // Check pipes on load
 checkPipes();
+
+// KCC trace — every pipe interaction feeds the dataset
+const KCC_API = 'https://onlybrains.onrender.com';
+function tracePipe(pipe, question) {
+  fetch(KCC_API + '/api/trace/pipe', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pipe, question, response: 'visited' }),
+  }).catch(() => {});
+}
+document.querySelectorAll('.pipe-link, [data-pipe]').forEach(el => {
+  el.addEventListener('click', () => {
+    const pipe = el.dataset.pipe || el.textContent.trim();
+    tracePipe(pipe, 'pipe interaction');
+  });
+});
 </script>
 
 </body>
