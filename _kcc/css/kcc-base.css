@@ -1,0 +1,29 @@
+/* KCC shared base styles — dark theme, monospace, data-dense */
+:root {
+  --kcc-bg: #0a0a0f;
+  --kcc-surface: #12121a;
+  --kcc-border: #1e1e2e;
+  --kcc-text: #e0e0e0;
+  --kcc-dim: #667;
+  --kcc-accent: #6366f1;
+  --kcc-gold: #d4af37;
+  --kcc-green: #22c55e;
+  --kcc-purple: #8b5cf6;
+}
+
+.kcc-stat { background: var(--kcc-surface); border: 1px solid var(--kcc-border); border-radius: 6px; padding: 8px 12px; text-align: center; }
+.kcc-stat .v { display: block; font-size: 1.1rem; font-weight: 700; color: var(--kcc-accent); }
+.kcc-stat .l { display: block; font-size: 0.55rem; color: var(--kcc-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+.kcc-panel { background: var(--kcc-surface); border: 1px solid var(--kcc-border); border-radius: 6px; overflow: hidden; }
+.kcc-panel h3 { font-size: 0.75rem; color: var(--kcc-accent); padding: 6px 10px; border-bottom: 1px solid var(--kcc-border); margin: 0; }
+.kcc-panel-body { padding: 8px 10px; font-size: 0.75rem; color: var(--kcc-text); }
+
+.kcc-row { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid rgba(30,30,46,0.5); }
+.kcc-row:last-child { border: none; }
+.kcc-mono { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.7rem; }
+.kcc-green { color: var(--kcc-green); }
+.kcc-gold { color: var(--kcc-gold); }
+
+.kcc-pipes { display: flex; gap: 4px; }
+.kcc-pipe { width: 8px; height: 8px; border-radius: 50%; opacity: 0.7; }

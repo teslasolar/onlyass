@@ -1,0 +1,16 @@
+{
+  "_udt": "KccProject",
+  "_comment": "Template — copy into your project's tags/ and customize",
+  "name": "",
+  "domain": "",
+  "token": "KCC",
+  "api": "https://onlybrains.onrender.com",
+  "trace_endpoint": "/api/trace/<source>",
+  "mining": true,
+  "primes": [2, 3, 5, 7, 11, 13, 17],
+  "primorial": 510510,
+  "phi": 0.6180339887498949,
+  "bsv_anchor": true,
+  "mesh_channels": ["kcc-mesh", "onlybrains-mesh", "ass-os-mesh"],
+  "hf_dataset": "SolarTesla/onlybrains-reasoning-10k"
+}
